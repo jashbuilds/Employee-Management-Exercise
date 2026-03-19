@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+            crossorigin="anonymous">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet" href="../CSS/employeeForm.css">
+        <link rel="stylesheet" href="../CSS/style.css">
+        <title>Employee Management Form</title>
+    </head>
+
+    <body class="empForm">
+        <nav class="navbar navbar-expand-sm bg-body-secondary">
+            <div class="container-fluid">
+                <a class="navbar-brand ms-3" href="#">
+                    <img src="../Icons/onboarding.svg" alt="employee-icon"
+                        width="40" height="40">
+                </a>
+            </div>
+        </nav>
+
+        <div
+            class="ms-auto me-5 my-4 d-flex justify-content-end align-items-center">
+            <button class="btn btn-success" data-bs-toggle="modal"
+                data-bs-target="#exampleModal" type="submit">Add
+                Data</button>
+        </div>
+
+        <div class="modal fade" id="exampleModal" tabindex="-1"
+            aria-labelledby="exampleModalLabel" aria-hidden="true"
+            data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5"
+                            id="exampleModalLabel">Form</h1>
+                        <button type="button" class="btn-close"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="../HTML/employeeData.html">
+                            <div class="container border-bottom">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="mb-4">
+                                            <label for="fullName"
+                                                class="form-label">Full
+                                                Name</label>
+                                            <input type="text"
+                                                class="form-control"
+                                                id="fullName"
+                                                placeholder="Enter full name"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4">
+                                            <label for="email"
+                                                class="form-label">E-mail</label>
+                                            <input type="email"
+                                                class="form-control" id="email"
+                                                placeholder="Enter e-mail"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4">
+                                            <label for="department"
+                                                class="form-label">Department</label>
+                                            <select class="form-select"
+                                                aria-label="Select Department"
+                                                required>
+                                                <option selected></option>
+                                                <option value="1">HR</option>
+                                                <option
+                                                    value="2">Engineering</option>
+                                                <option value="3">Sales</option>
+                                                <option
+                                                    value="4">Marketing</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4">
+                                            <label for="role"
+                                                class="form-label">Role</label>
+                                            <input type="text"
+                                                class="form-control" id="role"
+                                                placeholder="Enter role"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4">
+                                            <label for="salary"
+                                                class="form-label">Salary</label>
+                                            <input type="number"
+                                                class="form-control" id="salary"
+                                                placeholder="Enter salary"
+                                                min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-4">
+                                            <label for="date"
+                                                class="form-label">Date</label>
+                                            <input type="date"
+                                                class="form-control" id="date"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="col-sm-6 d-flex align-items-start justify-content-start py-3">
+                                        <label for="status">Status:
+                                            &nbsp;</label>
+                                        <div
+                                            class="form-check form-switch">
+                                            <input class="form-check-input"
+                                                type="checkbox" role="switch"
+                                                id="status" checked>
+                                            <label class="form-check-label"
+                                                for="status"
+                                                id="showStatus">Active</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-3 flex-column flex-sm-row justify-content-end align-items-center py-3">
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Close</button>
+                                <button type="submit"
+                                    class="btn btn-primary">Save
+                                    changes</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"></script>
+        <script src="../JavaScript/script.js"></script>
+    </body>
+
+</html>
