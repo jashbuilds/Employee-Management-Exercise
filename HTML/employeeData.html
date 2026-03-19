@@ -19,9 +19,10 @@
         <title>Employee Management Form</title>
     </head>
 
-    <body class="empForm">
+    <body class="empData">
         <nav class="navbar navbar-expand-sm bg-body-secondary">
-            <div class="container-fluid">
+            <div
+                class="container-fluid d-flex justify-content-center align-items-center">
                 <a class="navbar-brand ms-3" href="#">
                     <img src="../Icons/onboarding.svg" alt="employee-icon"
                         width="40" height="40">
@@ -30,7 +31,7 @@
         </nav>
 
         <div
-            class="ms-auto me-5 my-4 d-flex justify-content-end align-items-center">
+            class="ms-auto me-3 me-sm-4 my-3 my-sm-4 d-flex justify-content-end align-items-center">
             <button class="btn btn-success" data-bs-toggle="modal"
                 data-bs-target="#exampleModal" type="submit">Add
                 Data</button>
@@ -48,10 +49,11 @@
                             data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="../HTML/employeeData.html">
+                        <form action="../HTML/employeeData.html"
+                            class="mt-0 mt-sm-3">
                             <div class="container border-bottom">
                                 <div class="row">
-                                    <div class="col-sm-6">
+                                    <div class="col-md-6">
                                         <div class="mb-4">
                                             <label for="fullName"
                                                 class="form-label">Full
@@ -63,7 +65,7 @@
                                                 required>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-md-6">
                                         <div class="mb-4">
                                             <label for="email"
                                                 class="form-label">E-mail</label>
@@ -73,24 +75,24 @@
                                                 required>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-md-6">
                                         <div class="mb-4">
                                             <label for="department"
                                                 class="form-label">Department</label>
-                                            <select class="form-select"
+                                            <select class="form-select" id="department"
                                                 aria-label="Select Department"
                                                 required>
                                                 <option selected></option>
-                                                <option value="1">HR</option>
+                                                <option value="HR">HR</option>
                                                 <option
-                                                    value="2">Engineering</option>
-                                                <option value="3">Sales</option>
+                                                    value="Engineering">Engineering</option>
+                                                <option value="Sales">Sales</option>
                                                 <option
-                                                    value="4">Marketing</option>
+                                                    value="Marketing">Marketing</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-md-6">
                                         <div class="mb-4">
                                             <label for="role"
                                                 class="form-label">Role</label>
@@ -100,7 +102,7 @@
                                                 required>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-md-6">
                                         <div class="mb-4">
                                             <label for="salary"
                                                 class="form-label">Salary</label>
@@ -110,17 +112,17 @@
                                                 min="0" required>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-md-6">
                                         <div class="mb-4">
-                                            <label for="date"
-                                                class="form-label">Date</label>
+                                            <label for="joiningDate"
+                                                class="form-label">Joining Date</label>
                                             <input type="date"
-                                                class="form-control" id="date"
+                                                class="form-control" id="joiningDate"
                                                 required>
                                         </div>
                                     </div>
                                     <div
-                                        class="col-sm-6 d-flex align-items-start justify-content-start py-3">
+                                        class="col-md-6 d-flex align-items-start justify-content-start py-3">
                                         <label for="status">Status:
                                             &nbsp;</label>
                                         <div
@@ -135,12 +137,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex gap-3 flex-column flex-sm-row justify-content-end align-items-center py-3">
+                            <div
+                                class="d-flex gap-3 flex-row justify-content-end align-items-center py-3">
+                                <button type="submit"
+                                    class="btn btn-primary" id="addBtn" disabled>Add Data</button>
                                 <button type="button" class="btn btn-secondary"
                                     data-bs-dismiss="modal">Close</button>
-                                <button type="submit"
-                                    class="btn btn-primary">Save
-                                    changes</button>
                             </div>
 
                         </form>
