@@ -1,4 +1,11 @@
 .empData {
     font-family: 'Montserrat', sans-serif;
-    font-weight: 500;
+}
+
+.empData .empLogo:focus {
+    outline: none;
+}
+
+.empData .mainContent .emptyDataMsg {
+    height: 250px;
 }
