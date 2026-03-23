@@ -14,6 +14,10 @@ const emptyDataMsg = document.querySelector(".emptyDataMsg");
 
 const employeeData = JSON.parse(localStorage.getItem("EmpData")) || [];
 
+let salaryAsc = true;
+let dateAsc = true;
+let currentDisplayData = [];
+
 statusToggle.addEventListener("change", () => {
   statusMsg.textContent = statusToggle.checked ? "Active" : "Inactive";
   statusMsg.value = statusToggle.checked ? "active" : "inactive";
@@ -34,7 +38,8 @@ const submitForm = (e) => {
   employeeData.push(formObj);
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
 
-  renderEmpTable();
+  currentDisplayData = [...employeeData]; 
+  renderEmpTable(currentDisplayData);
   empForm.reset();
   addDataBtn.disabled = true;
 };
@@ -73,33 +78,23 @@ if (
   document.getElementById("departmentDropDown").value === "" &&
   document.getElementById("statusDropDown").value === ""
 ) {
+  currentDisplayData = [...employeeData];
   renderEmpTable(employeeData);
 }
 
-const dataRow = document.querySelectorAll("#empDataRow");
-
 const searchEmpData = () => {
   const searchBox = document.getElementById("searchBox");
-  const searchBoxValue = searchBox.value.toLowerCase();
+  const searchValue = searchBox?.value?.toLowerCase() || "";
 
-  for (let i = 0; i < dataRow.length; i++) {
-    const empName = dataRow[i].getElementsByTagName("td")[0];
-    const empMail = dataRow[i].getElementsByTagName("td")[1];
-    const empRole = dataRow[i].getElementsByTagName("td")[3];
+  const filteredData = currentDisplayData.filter((emp) => {
+    return (
+      emp.fullName.toLowerCase().includes(searchValue) ||
+      emp.email.toLowerCase().includes(searchValue) ||
+      emp.role.toLowerCase().includes(searchValue)
+    );
+  });
 
-    if (empName && empMail && empRole) {
-      const empNameValue = empName.textContent;
-      const empMailValue = empMail.textContent;
-      const empRoleValue = empRole.textContent;
-
-      dataRow[i].style.display =
-        empNameValue.toLowerCase().indexOf(searchBoxValue) > -1 ||
-        empMailValue.toLowerCase().indexOf(searchBoxValue) > -1 ||
-        empRoleValue.toLowerCase().indexOf(searchBoxValue) > -1
-          ? ""
-          : "none";
-    }
-  }
+  renderEmpTable(filteredData);
 };
 
 const filterEmpData = () => {
@@ -115,44 +110,40 @@ const filterEmpData = () => {
 
     const salaryFilter =
       (minSalary === "" && maxSalary === "") ||
-      (emp.salary >= minSalary && emp.salary <= maxSalary);
+      (Number(emp.salary) >= Number(minSalary) && Number(emp.salary) <= Number(maxSalary));
 
     return deptFilter && statusFilter && salaryFilter;
   });
 
+  currentDisplayData = filteredData;
   renderEmpTable(filteredData);
 };
 
 const sortEmpSalary = () => {
-
-  let salaryAsc = true
-
-  employeeData.sort((a, b) => salaryAsc ? a.salary - b.salary : b.salary - a.salary)
+  currentDisplayData.sort((a, b) => salaryAsc ? Number(a.salary) - Number(b.salary) : Number(b.salary) - Number(a.salary))
   salaryAsc = !salaryAsc
   
-  renderEmpTable(employeeData)
+  renderEmpTable(currentDisplayData)
 };
 
 const sortEmpDate = () => {
-  let dateAsc = true
-
-  employeeData.sort((a, b) => dateAsc ? new Date(a.joiningDate) - new Date(b.joiningDate) : new Date(b.joiningDate) - new Date(a.joiningDate))
+  currentDisplayData.sort((a, b) => dateAsc ? new Date(a.joiningDate) - new Date(b.joiningDate) : new Date(b.joiningDate) - new Date(a.joiningDate))
   dateAsc = !dateAsc
   
-  renderEmpTable(employeeData)
+  renderEmpTable(currentDisplayData)
 }
 
 const validateFormInput = () => {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-  addDataBtn.disabled =
-    empName.value.trim() === "" ||
-    empMail.value.trim() === "" ||
-    empDept.value.trim() === "" ||
-    empRole.value.trim() === "" ||
-    empSalary.value.trim() === "" ||
-    empJoinDate.value.trim() === "" ||
-    !emailRegex.test(empMail.value)
-      ? true
-      : false;
+  const isFormValid =
+    empName.value.trim() !== "" &&
+    empMail.value.trim() !== "" &&
+    empDept.value.trim() !== "" &&
+    empRole.value.trim() !== "" &&
+    empSalary.value.trim() !== "" &&
+    empJoinDate.value.trim() !== "" &&
+    emailRegex.test(empMail.value);
+
+  addDataBtn.disabled = !isFormValid;
 };
