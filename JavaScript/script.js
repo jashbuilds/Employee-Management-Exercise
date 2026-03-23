@@ -1,5 +1,5 @@
 const statusMsg = document.getElementById("showStatus");
-const statusToggle = document.getElementById("status");
+const statusToggle = document.getElementById("statusToggle");
 const addDataBtn = document.getElementById("addBtn");
 const empName = document.getElementById("fullName");
 const empMail = document.getElementById("email");
@@ -39,7 +39,7 @@ const submitForm = (e) => {
   addDataBtn.disabled = true;
 };
 
-const renderEmpTable = () => {
+const renderEmpTable = (data) => {
   if (employeeData.length === 0) {
     emptyDataMsg.classList.remove("d-none");
   } else {
@@ -47,13 +47,13 @@ const renderEmpTable = () => {
     empTable.classList.remove("d-none");
   }
 
-  tableBody.innerHTML = employeeData
+  tableBody.innerHTML = data
     .map(
       (emp) => `
     <tr id="empDataRow">
     <td id="empFullName">${emp.fullName}</td>
     <td id="empMail">${emp.email}</td>
-                            <td>${emp.department}</td>
+                            <td id="empDept">${emp.department}</td>
                             <td id="empRole">${emp.role}</td>
                             <td>${emp.salary}</td>
                             <td>${emp.joiningDate}</td>
@@ -69,13 +69,18 @@ const renderEmpTable = () => {
     .join("");
 };
 
-renderEmpTable();
+if (
+  document.getElementById("departmentDropDown").value === "" &&
+  document.getElementById("statusDropDown").value === ""
+) {
+  renderEmpTable(employeeData);
+}
+
+const dataRow = document.querySelectorAll("#empDataRow");
 
 const searchEmpData = () => {
-  const dataRow = document.querySelectorAll("#empDataRow");
   const searchBox = document.getElementById("searchBox");
-
-  const filter = searchBox.value.toLowerCase();
+  const searchBoxValue = searchBox.value.toLowerCase();
 
   for (let i = 0; i < dataRow.length; i++) {
     const empName = dataRow[i].getElementsByTagName("td")[0];
@@ -87,11 +92,55 @@ const searchEmpData = () => {
       const empMailValue = empMail.textContent;
       const empRoleValue = empRole.textContent;
 
-      dataRow[i].style.display = (empNameValue.toLowerCase().indexOf(filter) > -1 || empMailValue.toLowerCase().indexOf(filter) > -1 || empRoleValue.toLowerCase().indexOf(filter) > -1) ? "" : "none"
-
+      dataRow[i].style.display =
+        empNameValue.toLowerCase().indexOf(searchBoxValue) > -1 ||
+        empMailValue.toLowerCase().indexOf(searchBoxValue) > -1 ||
+        empRoleValue.toLowerCase().indexOf(searchBoxValue) > -1
+          ? ""
+          : "none";
     }
   }
 };
+
+const filterEmpData = () => {
+  const selectedDept = document.getElementById("departmentDropDown").value;
+  const selectedStatus = document.getElementById("statusDropDown").value;
+  const minSalary = document.getElementById("minSal").value;
+  const maxSalary = document.getElementById("maxSal").value;
+
+  const filteredData = employeeData.filter((emp) => {
+    const deptFilter = selectedDept === "" || emp.department === selectedDept;
+
+    const statusFilter = selectedStatus === "" || emp.status === selectedStatus;
+
+    const salaryFilter =
+      (minSalary === "" && maxSalary === "") ||
+      (emp.salary >= minSalary && emp.salary <= maxSalary);
+
+    return deptFilter && statusFilter && salaryFilter;
+  });
+
+  renderEmpTable(filteredData);
+};
+
+const sortEmpSalary = () => {
+
+  let salaryAsc = true
+
+  employeeData.sort((a, b) => salaryAsc ? a.salary - b.salary : b.salary - a.salary)
+  salaryAsc = !salaryAsc
+  
+  renderEmpTable(employeeData)
+};
+
+const sortEmpDate = () => {
+  let dateAsc = true
+
+  employeeData.sort((a, b) => dateAsc ? new Date(a.joiningDate) - new Date(b.joiningDate) : new Date(b.joiningDate) - new Date(a.joiningDate))
+  dateAsc = !dateAsc
+  
+  renderEmpTable(employeeData)
+}
 
 const validateFormInput = () => {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;

@@ -18,7 +18,7 @@
 </head>
 
 <body class="empData fw-medium">
-    <nav class="navbar navbar-expand-sm bg-body-secondary">
+    <nav class="navbar navbar-expand-sm bg-primary bg-gradient">
         <div class="container-fluid d-flex justify-content-center align-items-center">
             <a class="navbar-brand m-0" href="#">
                 <img src="../Icons/onboarding.svg" alt="employee-icon" width="40" height="40" class="empLogo">
@@ -39,8 +39,8 @@
                     <span class="input-group-text bg-white rounded-start    ">
                         <img src="../Icons/search.svg" class="img-fluid" alt="search-icon">
                     </span>
-                    <input type="text" id="searchInput" class="form-control border-start-0"
-                        placeholder="Search by name...">
+                    <input type="search" id="searchBox" class="form-control border-start-0"
+                        placeholder="Search by name..." oninput="searchEmpData()">
                 </div>
             </div>
 
@@ -50,8 +50,8 @@
                     <span class="input-group-text bg-light border-end-0">
                         <img src="../Icons/department.svg" alt="department-icon">
                     </span>
-                    <select class="form-select" id="department" aria-label="Select Department">
-                        <option selected>All Dept</option>
+                    <select class="form-select" id="departmentDropDown" aria-label="Select Department" onchange="filterEmpData()">
+                        <option value="" selected>All Dept</option>
                         <option value="HR">HR</option>
                         <option value="Engineering">Engineering</option>
                         <option value="Sales">Sales</option>
@@ -63,8 +63,8 @@
                     <span class="input-group-text bg-light border-end-0">
                         <img src="../Icons/status.svg" alt="status-icon">
                     </span>
-                    <select id="statusFilter" class="form-select border-start-0">
-                        <option value="All">Status</option>
+                    <select id="statusDropDown" class="form-select border-start-0" onchange="filterEmpData()">
+                        <option value="">Status</option>
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                     </select>
@@ -74,8 +74,8 @@
                     <span class="input-group-text bg-light border-end-0">
                         <img src="../Icons/currency.svg" alt="salary-icon">
                     </span>
-                    <input type="number" id="minSal" min="0" class="form-control border-start-0" placeholder="Min">
-                    <input type="number" id="maxSal" min="0" class="form-control" placeholder="Max">
+                    <input type="number" id="minSal" min="0" class="form-control border-start-0" placeholder="Min" onchange="filterEmpData()">
+                    <input type="number" id="maxSal" min="0" class="form-control" placeholder="Max" oninput="filterEmpData()">
                 </div>
 
             </div>
@@ -96,8 +96,8 @@
                         <th scope="col">E-mail</th>
                         <th scope="col">Department</th>
                         <th scope="col">Role</th>
-                        <th scope="col">Salary</th>
-                        <th scope="col">Joining Date</th>
+                        <th scope="col" class="c-pointer" onclick="sortEmpSalary()">Salary &nbsp;<img src="../Icons/filter.svg" class="align-items-center" alt="filter-icon" width="16" height="16"></th>
+                        <th scope="col" class="c-pointer" onclick="sortEmpDate()">Joining Date &nbsp;<img src="../Icons/filter.svg" class="align-items-center" alt="filter-icon" width="16" height="16"></th>
                         <th scope="col">Status</th>
                         <th scope="col">Edit/Delete</th>
                     </tr>
@@ -140,7 +140,7 @@
                                             <label for="department" class="form-label">Department</label>
                                             <select class="form-select" id="department" aria-label="Select Department"
                                                 oninput="validateFormInput()" required>
-                                                <option selected>All Departments</option>
+                                                <option value="" selected>All Departments</option>
                                                 <option value="HR">HR</option>
                                                 <option value="Engineering">Engineering</option>
                                                 <option value="Sales">Sales</option>
@@ -175,12 +175,12 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6 d-flex align-items-start justify-content-start py-3">
-                                        <label for="status">Status:
+                                        <label for="statusToggle">Status:
                                             &nbsp;</label>
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" role="switch" id="status"
+                                            <input class="form-check-input" type="checkbox" role="switch" id="statusToggle"
                                                 checked>
-                                            <label class="form-check-label" for="status" value="active"
+                                            <label class="form-check-label" for="showStatus" value="active"
                                                 id="showStatus">Active</label>
                                         </div>
                                     </div>

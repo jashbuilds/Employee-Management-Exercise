@@ -9,3 +9,12 @@
 .empData .mainContent .emptyDataMsg {
     height: 250px;
 }
+
+.c-pointer {
+    cursor: pointer;
+}
+
+.btn-rotate {
+    transition: transform 0.5s;
+    transform: rotate(180deg);
+}
