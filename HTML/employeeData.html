@@ -1,209 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+            crossorigin="anonymous">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net">
 
-    <link rel="stylesheet" href="../CSS/style.css">
-    <title>Employee Management Form</title>
-</head>
+        <link rel="stylesheet" href="../CSS/style.css">
+        <title>Employee Management Form</title>
+    </head>
 
-<body class="empData fw-medium">
-    <nav class="navbar navbar-expand-sm bg-primary bg-gradient">
-        <div class="container-fluid d-flex justify-content-center align-items-center">
-            <a class="navbar-brand m-0" href="#">
-                <img src="../Icons/onboarding.svg" alt="employee-icon" width="40" height="40" class="empLogo">
-            </a>
-        </div>
-    </nav>
+    <body class="empData fw-medium">
+        <nav class="navbar navbar-expand-sm bg-primary bg-gradient">
+            <div
+                class="container-fluid d-flex justify-content-center align-items-center">
+                <a class="navbar-brand m-0" href="#">
+                    <img src="../Icons/onboarding.svg" alt="employee-icon"
+                        width="40" height="40" class="empLogo" tabindex="0">
+                </a>
+            </div>
+        </nav>
 
-    <main class="mainContent">
-        <div class="ms-auto me-3 me-sm-4 my-3 my-sm-4 d-flex justify-content-end align-items-center">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#employeeForm" type="submit">Add
-                Data</button>
-        </div>
-
-        <div class="d-flex flex-column flex-md-row align-items-md-center gap-4 mb-4 mx-3">
-
-            <div class="flex-grow-1 order-last order-md-0">
-                <div class="input-group overflow-hidden">
-                    <span class="input-group-text bg-white rounded-start    ">
-                        <img src="../Icons/search.svg" class="img-fluid" alt="search-icon">
-                    </span>
-                    <input type="search" id="searchBox" class="form-control border-start-0"
-                        placeholder="Search by name..." oninput="searchEmpData()">
-                </div>
+        <main class="mainContent">
+            <div
+                class="my-3 my-sm-4 d-flex justify-content-end align-items-center">
+                <a class="btn btn-primary me-auto ms-3 ms-sm-3 d-none"
+                    onclick="exportToCsv()" id="exportBtn">Export</a>
+                <button class="btn btn-success ms-auto me-3 me-sm-3"
+                    data-bs-toggle="modal"
+                    data-bs-target="#employeeForm" type="submit">Add
+                    Data</button>
             </div>
 
-            <div class="d-flex flex-wrap flex-md-nowrap gap-4 gap-md-3 align-items-center">
+            <div
+                class="d-flex flex-column flex-md-row align-items-md-center gap-5 mb-4 mx-3 mt-5 interactFields d-none">
 
-                <div class="input-group ">
-                    <span class="input-group-text bg-light border-end-0">
-                        <img src="../Icons/department.svg" alt="department-icon">
-                    </span>
-                    <select class="form-select" id="departmentDropDown" aria-label="Select Department" onchange="filterEmpData()">
-                        <option value="" selected>All Dept</option>
-                        <option value="HR">HR</option>
-                        <option value="Engineering">Engineering</option>
-                        <option value="Sales">Sales</option>
-                        <option value="Marketing">Marketing</option>
-                    </select>
-                </div>
-
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0">
-                        <img src="../Icons/status.svg" alt="status-icon">
-                    </span>
-                    <select id="statusDropDown" class="form-select border-start-0" onchange="filterEmpData()">
-                        <option value="">Status</option>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                    </select>
-                </div>
-
-                <div class="input-group ">
-                    <span class="input-group-text bg-light border-end-0">
-                        <img src="../Icons/currency.svg" alt="salary-icon">
-                    </span>
-                    <input type="number" id="minSal" min="0" class="form-control border-start-0" placeholder="Min" oninput="filterEmpData()">
-                    <input type="number" id="maxSal" min="0" class="form-control" placeholder="Max" oninput="filterEmpData()">
-                </div>
-
-            </div>
-        </div>
-
-
-        <div
-            class="emptyDataMsg d-flex align-items-center justify-content-center border border-secondary-subtle rounded-2 mx-3 mt-3 d-none">
-            <img src="../Icons/exclamation-circle.svg" alt="exclamation-sign"> &nbsp;
-            <p class="m-0 text-body-tertiary">No Data Available</p>
-        </div>
-
-        <div class="table-responsive-xl mx-3 mt-5 d-none text-nowrap" id="empTable">
-            <table class="table table-striped table-hover table-bordered text-md-center fs-6 fs-md">
-                <thead>
-                    <tr>
-                        <th scope="col">Full Name</th>
-                        <th scope="col">E-mail</th>
-                        <th scope="col">Department</th>
-                        <th scope="col">Role</th>
-                        <th scope="col" class="c-pointer" onclick="sortEmpSalary()">Salary &nbsp;<img src="../Icons/filter.svg" class="align-items-center" alt="filter-icon" width="16" height="16"></th>
-                        <th scope="col" class="c-pointer" onclick="sortEmpDate()">Joining Date &nbsp;<img src="../Icons/filter.svg" class="align-items-center" alt="filter-icon" width="16" height="16"></th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Edit/Delete</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- Table rows will go here. -->
-                </tbody>
-            </table>
-        </div>
-
-        <div class="modal fade" id="employeeForm" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true"
-            data-bs-backdrop="static" data-bs-keyboard="false">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="employeeModalLabel">Form</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="flex-grow-1 order-last order-md-0">
+                    <div class="input-group overflow-hidden">
+                        <span
+                            class="input-group-text bg-white rounded-start">
+                            <img src="../Icons/search.svg" class="img-fluid"
+                                alt="search-icon">
+                        </span>
+                        <input type="search" id="searchBox"
+                            class="form-control border-start-0"
+                            placeholder="Search..."
+                            oninput="searchEmpData()">
                     </div>
-                    <div class="modal-body">
-                        <form action="../HTML/employeeData.html" class="mt-0 mt-sm-3" id="empForm">
-                            <div class="container border-bottom">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <label for="fullName" class="form-label">Full
-                                                Name</label>
-                                            <input type="text" class="form-control" id="fullName"
-                                                placeholder="Enter full name" oninput="validateFormInput()" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <label for="email" class="form-label">E-mail</label>
-                                            <input type="email" class="form-control" id="email"
-                                                placeholder="Enter e-mail" oninput="validateFormInput()" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <label for="department" class="form-label">Department</label>
-                                            <select class="form-select" id="department" aria-label="Select Department"
-                                                oninput="validateFormInput()" required>
-                                                <option value="" selected>All Departments</option>
-                                                <option value="HR">HR</option>
-                                                <option value="Engineering">Engineering</option>
-                                                <option value="Sales">Sales</option>
-                                                <option value="Marketing">Marketing</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <label for="role" class="form-label">Role</label>
-                                            <input type="text" class="form-control" id="role" placeholder="Enter role"
-                                                oninput="validateFormInput()" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <label for="salary" class="form-label">Salary</label>
-                                            <div class="input-group">
-                                                <input type="number" class="form-control" id="salary"
-                                                    placeholder="Enter salary" oninput="validateFormInput()" min="0"
+                </div>
+
+                <div
+                    class="d-flex flex-wrap flex-md-nowrap gap-5 gap-md-3 align-items-center">
+
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <img src="../Icons/department.svg"
+                                alt="department-icon">
+                        </span>
+                        <select class="form-select" id="departmentDropDown"
+                            aria-label="Select Department"
+                            onchange="filterEmpData()">
+                            <option value selected>All Dept</option>
+                            <option value="HR">HR</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Marketing">Marketing</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <img src="../Icons/status.svg" alt="status-icon">
+                        </span>
+                        <select id="statusDropDown"
+                            class="form-select border-start-0"
+                            onchange="filterEmpData()">
+                            <option value>Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group ">
+                        <span class="input-group-text bg-light border-end-0">
+                            <img src="../Icons/currency.svg" alt="salary-icon">
+                        </span>
+                        <input type="number" id="minSal" min="0"
+                            class="form-control border-start-0"
+                            placeholder="Min" oninput="filterEmpData()">
+                        <input type="number" id="maxSal" min="0"
+                            class="form-control" placeholder="Max"
+                            oninput="filterEmpData()">
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="emptyDataMsg d-flex align-items-center justify-content-center border border-secondary-subtle rounded-2 mx-3 mt-3 d-none">
+                <img src="../Icons/exclamation-circle.svg"
+                    alt="exclamation-sign"> &nbsp;
+                <p class="m-0 text-body-tertiary">No Data Available</p>
+            </div>
+
+            <div class="table-responsive-xl mx-3 mt-5 d-none text-nowrap"
+                id="empTable">
+                <table
+                    class="table table-hover table-bordered text-md-center fs-6 fs-md">
+                    <thead class="table-success">
+                        <tr>
+                            <th scope="col">Full Name</th>
+                            <th scope="col">E-mail</th>
+                            <th scope="col">Department</th>
+                            <th scope="col">Role</th>
+                            <th scope="col" class="c-pointer"
+                                onclick="sortEmpSalary()">Salary &nbsp;<img
+                                    src="../Icons/filter-arrow-down.svg"
+                                    class="align-items-center"
+                                    alt="filter-arrow-down"
+                                    width="16" height="16" id="sortBySalary"></th>
+                            <th scope="col" class="c-pointer"
+                                onclick="sortEmpDate()">Joining Date &nbsp;<img
+                                    src="../Icons/filter-arrow-down.svg"
+                                    class="align-items-center"
+                                    alt="filter-arrow-down"
+                                    width="16" height="16" id="sortByDate"></th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Edit/Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Table rows will go here. -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal fade" id="employeeForm" tabindex="-1"
+                aria-labelledby="formModalLabel" aria-hidden="true"
+                data-bs-backdrop="static" data-bs-keyboard="false">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5"
+                                id="employeeModalLabel">Form</h1>
+                            <button type="button" class="btn-close"
+                                data-bs-dismiss="modal" aria-label="Close"
+                                onclick="return empForm.reset()"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="../HTML/employeeData.html"
+                                class="mt-0 mt-sm-3" id="empForm">
+                                <div class="container border-bottom">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <label for="fullName"
+                                                    class="form-label">Full
+                                                    Name</label>
+                                                <input type="text"
+                                                    class="form-control"
+                                                    id="fullName"
+                                                    placeholder="Enter full name"
+                                                    oninput="validateFormInput()"
                                                     required>
-                                                <span class="input-group-text">$</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <label for="email"
+                                                    class="form-label">E-mail</label>
+                                                <input type="email"
+                                                    class="form-control"
+                                                    id="email"
+                                                    placeholder="Enter e-mail"
+                                                    oninput="validateFormInput()"
+                                                    required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <label for="department"
+                                                    class="form-label">Department</label>
+                                                <select class="form-select"
+                                                    id="department"
+                                                    aria-label="Select Department"
+                                                    oninput="validateFormInput()"
+                                                    required>
+                                                    <option value selected>All
+                                                        Departments</option>
+                                                    <option
+                                                        value="HR">HR</option>
+                                                    <option
+                                                        value="Engineering">Engineering</option>
+                                                    <option
+                                                        value="Sales">Sales</option>
+                                                    <option
+                                                        value="Marketing">Marketing</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <label for="role"
+                                                    class="form-label">Role</label>
+                                                <input type="text"
+                                                    class="form-control"
+                                                    id="role"
+                                                    placeholder="Enter role"
+                                                    oninput="validateFormInput()"
+                                                    required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <label for="salary"
+                                                    class="form-label">Salary</label>
+                                                <div class="input-group">
+                                                    <input type="number"
+                                                        class="form-control"
+                                                        id="salary"
+                                                        placeholder="Enter salary"
+                                                        oninput="validateFormInput()"
+                                                        min="0"
+                                                        required>
+                                                    <span
+                                                        class="input-group-text">$</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <label for="joiningDate"
+                                                    class="form-label">Joining
+                                                    Date</label>
+                                                <input type="date"
+                                                    class="form-control"
+                                                    id="joiningDate"
+                                                    oninput="validateFormInput()"
+                                                    required>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="col-md-6 d-flex align-items-start justify-content-start py-3">
+                                            <label for="statusToggle">Status:
+                                                &nbsp;</label>
+                                            <div class="form-check form-switch">
+                                                <input
+                                                    class="form-check-input c-pointer"
+                                                    type="checkbox"
+                                                    role="switch"
+                                                    id="statusToggle"
+                                                    checked>
+                                                <label class="form-check-label"
+                                                    for="showStatus"
+                                                    value="active"
+                                                    id="showStatus">Active</label>
+
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-4">
-                                            <label for="joiningDate" class="form-label">Joining
-                                                Date</label>
-                                            <input type="date" class="form-control" id="joiningDate"
-                                                oninput="validateFormInput()" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 d-flex align-items-start justify-content-start py-3">
-                                        <label for="statusToggle">Status:
-                                            &nbsp;</label>
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" role="switch" id="statusToggle"
-                                                checked>
-                                            <label class="form-check-label" for="showStatus" value="active"
-                                                id="showStatus">Active</label>
-                                        </div>
-                                    </div>
                                 </div>
-                            </div>
-                            <div class="d-flex gap-3 flex-row justify-content-end align-items-center py-3">
-                                <button type="submit" data-bs-dismiss="modal" onclick="submitForm(event)"
-                                    class="btn btn-primary" id="addBtn" disabled>Submit</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                                    onclick="return empForm.reset()">Close</button>
-                            </div>
+                                <div
+                                    class="d-flex gap-3 flex-row justify-content-end align-items-center py-3">
+                                    <button type="submit"
+                                        data-bs-dismiss="modal"
+                                        onclick="submitForm(event)"
+                                        class="btn btn-primary" id="submitBtn"
+                                        disabled>Submit</button>
+                                    <button type="button"
+                                        class="btn btn-secondary"
+                                        data-bs-dismiss="modal"
+                                        onclick="return empForm.reset()">Close</button>
+                                </div>
 
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
-    <script src="../JavaScript/script.js"></script>
-</body>
+            <div class="position-fixed bottom-0 end-0 p-3">
+                <div id="notificationToast"
+                    class="toast text-bg-success border-0 w-100" role="alert"
+                    aria-live="assertive"
+                    aria-atomic="true">
+                    <div class="d-flex">
+                        <div
+                            class="toast-body toast-message fw-bold text-center">
+                            <!-- Toast message -->
+                        </div>
+                        <button type="button"
+                            class="btn-close btn-close-white me-2 m-auto"
+                            data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"></script>
+        <script src="../JavaScript/script.js"></script>
+    </body>
 
 </html>

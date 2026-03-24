@@ -4,6 +4,7 @@
 
 .empData .empLogo:focus {
     outline: none;
+    border: none;
 }
 
 .empData .mainContent .emptyDataMsg {
@@ -12,9 +13,4 @@
 
 .c-pointer {
     cursor: pointer;
-}
-
-.btn-rotate {
-    transition: transform 0.5s;
-    transform: rotate(180deg);
 }
