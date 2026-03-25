@@ -7,10 +7,10 @@
     border: none;
 }
 
-.empData .mainContent .emptyDataMsg {
-    height: 250px;
+.empData .mainContent .emptyDataMsgField {
+    height: 300px;
 }
 
-.c-pointer {
+.cursor-pointer {
     cursor: pointer;
 }

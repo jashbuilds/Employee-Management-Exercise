@@ -8,11 +8,12 @@ const empRole = document.getElementById("role");
 const empSalary = document.getElementById("salary");
 const empJoinDate = document.getElementById("joiningDate");
 const tableBody = document.getElementById("tableBody");
-const empForm = document.getElementById("empForm");
+const empFormFields = document.getElementById("empForm");
 const empTable = document.getElementById("empTable");
-const emptyDataMsg = document.querySelector(".emptyDataMsg");
+const emptyDataMsg = document.querySelector(".emptyDataMsgField");
 const interactFields = document.querySelector(".interactFields");
 const exportBtn = document.getElementById("exportBtn");
+const employeeForm = document.getElementById("employeeForm");
 
 const employeeData = JSON.parse(localStorage.getItem("EmpData")) || [];
 
@@ -21,9 +22,19 @@ let dateAsc = true;
 let currentDisplayData = [];
 let editingIndex = -1;
 
-const showNotificationToast = (message) => {
+const showAcknowledgeToast = (message) => {
   const toastContainer = document.getElementById("notificationToast");
   const toastBody = toastContainer.querySelector(".toast-message");
+
+  toastBody.textContent = message;
+
+  const toast = new bootstrap.Toast(toastContainer);
+  toast.show();
+};
+
+const showDeleteToast = (message) => {
+  const toastContainer = document.getElementById("deleteToast");
+  const toastBody = toastContainer.querySelector(".delete-message");
 
   toastBody.textContent = message;
 
@@ -38,12 +49,12 @@ statusToggle.addEventListener("change", () => {
 
 const renderEmpTable = (data) => {
   if (data.length === 0) {
-    emptyDataMsg.classList.remove("d-none"); // if no data > show empty message
-    empTable.classList.add("d-none"); // if no data > hide employee table
+    emptyDataMsg.classList.remove("d-none");
+    empTable.classList.add("d-none");
   } else {
-    emptyDataMsg.classList.add("d-none"); // if data > hide empty message
-    empTable.classList.remove("d-none"); // if data > show employee data
-    interactFields.classList.remove("d-none"); // if data > show interact fields
+    emptyDataMsg.classList.add("d-none");
+    empTable.classList.remove("d-none");
+    interactFields.classList.remove("d-none");
     exportBtn.classList.remove("d-none");
   }
 
@@ -67,8 +78,9 @@ const renderEmpTable = (data) => {
     .join("");
 };
 
-const submitForm = (e) => {
+const addEmployee = (e) => {
   e.preventDefault();
+  document.getElementById("employeeModalLabel").textContent = "Add Employee";
   const formObj = {
     fullName: empName.value,
     email: empMail.value,
@@ -81,26 +93,24 @@ const submitForm = (e) => {
 
   if (editingIndex === -1) {
     employeeData.push(formObj);
-    showNotificationToast("Record Added Successfully!");
+    showAcknowledgeToast("Record Added Successfully.");
   } else {
     employeeData[editingIndex] = formObj;
     editingIndex = -1;
-    showNotificationToast("Record Updated Successfully!");
+    showAcknowledgeToast("Record Updated Successfully.");
   }
 
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
 
-  currentDisplayData = [...employeeData];
-  renderEmpTable(currentDisplayData);
-  submitBtn.textContent = "Submit";
-  empForm.reset();
   submitBtn.disabled = true;
-
+  submitBtn.textContent = "Submit";
+  filterEmpData();
+  empFormFields.reset();
 };
 
 const editEmployee = (email) => {
+  document.getElementById("employeeModalLabel").textContent = "Update Data";
   const employee = employeeData.find((emp) => emp.email === email);
-
   editingIndex = employeeData.indexOf(employee);
 
   empName.value = employee.fullName;
@@ -115,12 +125,16 @@ const editEmployee = (email) => {
   submitBtn.disabled = false;
   submitBtn.textContent = "Update";
 
-  const editModal = new bootstrap.Modal(
-    document.getElementById("employeeForm"),
-  );
+  const editModal = new bootstrap.Modal(employeeForm);
   editModal.show();
-
 };
+
+employeeForm.addEventListener("hidden.bs.modal", () => {
+  editingIndex = -1;
+  submitBtn.textContent = "Submit";
+  submitBtn.disabled = true;
+  empFormFields.reset();
+});
 
 const deleteEmployee = (email) => {
   const userPermission = confirm(
@@ -128,7 +142,7 @@ const deleteEmployee = (email) => {
   );
 
   if (userPermission === true) {
-    showNotificationToast("Record Deleted!");
+    showDeleteToast("Record Deleted!");
   } else {
     return;
   }
@@ -140,8 +154,11 @@ const deleteEmployee = (email) => {
 
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
 
-  renderEmpTable(employeeData);
-  window.location.reload();
+  employeeData.length === 0
+    ? window.location.reload()
+    : renderEmpTable(employeeData);
+
+  filterEmpData();
 };
 
 currentDisplayData = [...employeeData];
@@ -158,6 +175,9 @@ const searchEmpData = () => {
       emp.role.toLowerCase().includes(searchValue)
     );
   });
+  if (filteredData.length === 0) {
+    document.getElementById("emptyMsg").textContent = "No matching Data Found!";
+  }
 
   renderEmpTable(filteredData);
 };
@@ -173,13 +193,16 @@ const filterEmpData = () => {
 
     const statusFilter = selectedStatus === "" || emp.status === selectedStatus;
 
-    const salaryFilter =
-      (minSalary >= 0 && maxSalary === "") ||
-      (Number(emp.salary) >= Number(minSalary) &&
-        Number(emp.salary) <= Number(maxSalary));
+    const min = minSalary ? Number(minSalary) : 0;
+    const max = maxSalary ? Number(maxSalary) : Infinity;
+
+    const salaryFilter = Number(emp.salary) >= min && Number(emp.salary) <= max;
 
     return deptFilter && statusFilter && salaryFilter;
   });
+  if (filteredData.length === 0) {
+    document.getElementById("emptyMsg").textContent = "No matching Data Found!";
+  }
 
   currentDisplayData = filteredData;
   renderEmpTable(filteredData);
@@ -236,9 +259,9 @@ const validateFormInput = () => {
 
 const exportToCsv = () => {
   let csv = [];
-  const tr = document.querySelectorAll("tr");
+  const rows = document.querySelectorAll("tr");
 
-  tr.forEach((i) => {
+  rows.forEach((i) => {
     let cols = i.querySelectorAll("th, td");
     let csvRow = [];
 
