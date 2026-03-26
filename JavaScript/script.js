@@ -17,6 +17,10 @@ const employeeForm = document.getElementById("employeeForm");
 const modalHeading = document.getElementById("employeeModalLabel");
 const deleteConfirmModal = document.getElementById("deleteConfirmationModal");
 
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const NAME_REGEX = /^[a-zA-Z][a-zA-Z\s]+$/;
+const SALARY_REGEX = /^[0-9]*$/;
+
 const employeeData = JSON.parse(localStorage.getItem("EmpData")) || [];
 
 let salaryAsc = true;
@@ -46,7 +50,6 @@ const showWarningToast = (message) => {
 
 statusToggle.addEventListener("change", () => {
   statusMsg.innerHTML = statusToggle.checked ? "Active" : "Inactive";
-  statusMsg.value = statusToggle.checked ? "active" : "inactive";
 });
 
 const renderEmpTable = (data) => {
@@ -132,6 +135,7 @@ const editEmployee = (email) => {
   empJoinDate.value = employee.joiningDate;
   statusToggle.checked = employee.status === "Active";
   statusMsg.textContent = statusToggle.checked ? "Active" : "Inactive";
+  updateRequiredIndicators();
 
   submitBtn.disabled = false;
   submitBtn.textContent = "Update";
@@ -146,6 +150,10 @@ employeeForm.addEventListener("hidden.bs.modal", () => {
   submitBtn.textContent = "Submit";
   submitBtn.disabled = true;
   empFormFields.reset();
+  empMail.classList.remove("is-invalid");
+  document.querySelectorAll(".form-label.field-filled").forEach(label => {
+    label.classList.remove("field-filled");
+  });
 });
 
 const confirmDelete = (email) => {
@@ -163,14 +171,11 @@ const deleteEmployee = (email) => {
 
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
   showWarningToast("Employee Deleted!");
-  renderEmpTable(employeeData);
-
   filterEmpData();
 
   if (employeeData.length === 0) {
     document.getElementById("emptyMsg").textContent =
       "No Employee Data Available!";
-    window.location.reload();
   }
 };
 
@@ -202,11 +207,12 @@ const filterEmpData = () => {
   const maxSalary = document.getElementById("maxSal").value;
   const min = minSalary ? Number(minSalary) : 0;
   const max = maxSalary ? Number(maxSalary) : Infinity;
+  const maxSalInput = document.getElementById("maxSal");
 
-  if (max < min && max !== "" && min !== "") {
-    document.querySelector(".salaryRangeError").classList.remove("d-none");
+  if (max < min) {
+    maxSalInput.classList.add("is-invalid");
   } else {
-    document.querySelector(".salaryRangeError").classList.add("d-none");
+    maxSalInput.classList.remove("is-invalid");
 
     const filteredData = employeeData.filter((emp) => {
       const deptFilter = selectedDept === "" || emp.department === selectedDept;
@@ -275,8 +281,8 @@ const exportToCsv = () => {
 
       cols.forEach((j) => {
         csvRow.push(j.textContent);
-        csvRow.splice(7, 1);
       });
+      csvRow.splice(7, 1);
       csv.push(csvRow.join(","));
     });
 
@@ -284,18 +290,29 @@ const exportToCsv = () => {
     exportBtn.download = "Employee-Data";
     exportBtn.href = URL.createObjectURL(blob);
 
-    showAcknowledgeToast("Employee Data Downloaded Succesfully.");
+    showAcknowledgeToast("Employee Data Downloaded Successfully.");
   } else {
     showWarningToast("No Employee Data Available!");
   }
 };
 
+const validateEmail = () => {
+  const isDuplicateMail = employeeData.find(
+    (val, idx) => val.email === empMail.value && idx !== editingIndex
+  );
+  const isValidFormat = EMAIL_REGEX.test(empMail.value);
+
+  if (isValidFormat && !isDuplicateMail) {
+    empMail.classList.remove("is-invalid");
+  } else {
+    empMail.classList.add("is-invalid");
+  }
+};
+
 const validateFormInput = () => {
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const nameRegex = /^[a-zA-Z][a-zA-Z\s]+$/;
-  const salaryRegex = /^[0-9]*$/;
-  const data = currentDisplayData || [];
-  const isDuplicateMail = data.find((val) => val.email === empMail.value);
+  const isDuplicateMail = employeeData.find(
+    (val, idx) => val.email === empMail.value && idx !== editingIndex
+  );
 
   const isFormValid =
     !isDuplicateMail &&
@@ -305,18 +322,24 @@ const validateFormInput = () => {
     empRole.value.trim() !== "" &&
     empSalary.value.trim() !== "" &&
     empJoinDate.value.trim() !== "" &&
-    emailRegex.test(empMail.value) &&
-    nameRegex.test(empName.value) &&
-    emailRegex.test(empMail.value) &&
-    salaryRegex.test(empSalary.value);
+    EMAIL_REGEX.test(empMail.value) &&
+    NAME_REGEX.test(empName.value) &&
+    SALARY_REGEX.test(empSalary.value);
 
   submitBtn.disabled = !isFormValid;
+  updateRequiredIndicators();
+};
 
-  const validEmailCheck = emailRegex.test(empMail.value);
-
-  if (!isDuplicateMail && validEmailCheck) {
-    document.querySelector(".invalidMail").classList.add("d-none");
-  } else {
-    document.querySelector(".invalidMail").classList.remove("d-none");
-  }
+const updateRequiredIndicators = () => {
+  const fields = [empName, empMail, empDept, empRole, empSalary, empJoinDate];
+  fields.forEach(field => {
+    const label = document.querySelector(`label[for="${field.id}"]`);
+    if (label) {
+      if (field.value.trim() !== "") {
+        label.classList.add("field-filled");
+      } else {
+        label.classList.remove("field-filled");
+      }
+    }
+  });
 };

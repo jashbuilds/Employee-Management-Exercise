@@ -16,10 +16,24 @@
     color: red;
 }
 
+.empData .mainContent .form-label.field-filled:after {
+    content: "";
+}
+
 .cursor-pointer {
     cursor: pointer;
 }
 
 .font-14 {
     font-size: 14px;
+}
+
+#minSal~.invalid-feedback,
+#maxSal~.invalid-feedback {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    margin-top: 2px;
 }
