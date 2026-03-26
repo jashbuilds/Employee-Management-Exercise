@@ -14,6 +14,8 @@ const emptyDataMsg = document.querySelector(".emptyDataMsgField");
 const interactFields = document.querySelector(".interactFields");
 const exportBtn = document.getElementById("exportBtn");
 const employeeForm = document.getElementById("employeeForm");
+const modalHeading = document.getElementById("employeeModalLabel");
+const deleteConfirmModal = document.getElementById("deleteConfirmationModal");
 
 const employeeData = JSON.parse(localStorage.getItem("EmpData")) || [];
 
@@ -32,7 +34,7 @@ const showAcknowledgeToast = (message) => {
   toast.show();
 };
 
-const showDeleteToast = (message) => {
+const showWarningToast = (message) => {
   const toastContainer = document.getElementById("deleteToast");
   const toastBody = toastContainer.querySelector(".delete-message");
 
@@ -50,11 +52,9 @@ statusToggle.addEventListener("change", () => {
 const renderEmpTable = (data) => {
   if (data.length === 0) {
     emptyDataMsg.classList.remove("d-none");
-    empTable.classList.add("d-none");
   } else {
     emptyDataMsg.classList.add("d-none");
     empTable.classList.remove("d-none");
-    interactFields.classList.remove("d-none");
     exportBtn.classList.remove("d-none");
   }
 
@@ -68,19 +68,30 @@ const renderEmpTable = (data) => {
                             <td class="align-content-center">${emp.role}</td>
                             <td class="align-content-center">${emp.salary}</td>
                             <td class="align-content-center">${emp.joiningDate}</td>
-                            <td class="align-content-center">${emp.status}</td>
+                            <td class="align-content-center"><span class="badge rounded-pill statusBadge">${emp.status}</span></td>
                             <td class="d-flex align-items-center justify-content-center gap-3">
                               <button type="button" class="btn btn-primary btn-sm" onclick="return editEmployee('${emp.email}')"><img src="../Icons/edit-btn.svg" alt="edit-button" width="16" height="14"></button>
-                              <button type="button" class="btn btn-danger btn-sm" onclick="return deleteEmployee('${emp.email}')"><img src="../Icons/delete-btn.svg" alt="delete-button" width="16" height="14"></button>
+                              <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" onclick="confirmDelete('${emp.email}')"><img src="../Icons/delete-btn.svg" alt="delete-button" width="16" height="14"></button>
                             </td>
                           </tr>`,
     )
     .join("");
+
+  const empStatus = document.querySelectorAll(".statusBadge");
+
+  empStatus.forEach((val) => {
+    if (val.textContent === "Active") {
+      val.classList.add("text-bg-success");
+      val.classList.remove("text-bg-danger");
+    } else {
+      val.classList.remove("text-bg-success");
+      val.classList.add("text-bg-danger");
+    }
+  });
 };
 
 const addEmployee = (e) => {
   e.preventDefault();
-  document.getElementById("employeeModalLabel").textContent = "Add Employee";
   const formObj = {
     fullName: empName.value,
     email: empMail.value,
@@ -93,11 +104,11 @@ const addEmployee = (e) => {
 
   if (editingIndex === -1) {
     employeeData.push(formObj);
-    showAcknowledgeToast("Record Added Successfully.");
+    showAcknowledgeToast("Employee Added Successfully.");
   } else {
     employeeData[editingIndex] = formObj;
     editingIndex = -1;
-    showAcknowledgeToast("Record Updated Successfully.");
+    showAcknowledgeToast("Employee Updated Successfully.");
   }
 
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
@@ -109,7 +120,7 @@ const addEmployee = (e) => {
 };
 
 const editEmployee = (email) => {
-  document.getElementById("employeeModalLabel").textContent = "Update Data";
+  modalHeading.textContent = "Update Employee";
   const employee = employeeData.find((emp) => emp.email === email);
   editingIndex = employeeData.indexOf(employee);
 
@@ -130,35 +141,37 @@ const editEmployee = (email) => {
 };
 
 employeeForm.addEventListener("hidden.bs.modal", () => {
+  modalHeading.textContent = "Add Employee";
   editingIndex = -1;
   submitBtn.textContent = "Submit";
   submitBtn.disabled = true;
   empFormFields.reset();
 });
 
+const confirmDelete = (email) => {
+  document.getElementById("deleteConfirm").innerHTML =
+    `<button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="return deleteEmployee('${email}')">Yes</button>`;
+};
+
 const deleteEmployee = (email) => {
-  const userPermission = confirm(
-    "Are you sure, you want to delete this field ?",
-  );
-
-  if (userPermission === true) {
-    showDeleteToast("Record Deleted!");
-  } else {
-    return;
-  }
-
   const employee = employeeData.find((emp) => emp.email === email);
   const position = employeeData.indexOf(employee);
 
   employeeData.splice(position, 1);
 
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
-
-  employeeData.length === 0
-    ? window.location.reload()
-    : renderEmpTable(employeeData);
+  showWarningToast("Employee Deleted!");
+  renderEmpTable(employeeData);
 
   filterEmpData();
+
+  if (employeeData.length === 0) {
+    document.getElementById("emptyMsg").textContent =
+      "No Employee Data Available!";
+    window.location.reload();
+  }
 };
 
 currentDisplayData = [...employeeData];
@@ -187,25 +200,34 @@ const filterEmpData = () => {
   const selectedStatus = document.getElementById("statusDropDown").value;
   const minSalary = document.getElementById("minSal").value;
   const maxSalary = document.getElementById("maxSal").value;
+  const min = minSalary ? Number(minSalary) : 0;
+  const max = maxSalary ? Number(maxSalary) : Infinity;
 
-  const filteredData = employeeData.filter((emp) => {
-    const deptFilter = selectedDept === "" || emp.department === selectedDept;
+  if (max < min && max !== "" && min !== "") {
+    document.querySelector(".salaryRangeError").classList.remove("d-none");
+  } else {
+    document.querySelector(".salaryRangeError").classList.add("d-none");
 
-    const statusFilter = selectedStatus === "" || emp.status === selectedStatus;
+    const filteredData = employeeData.filter((emp) => {
+      const deptFilter = selectedDept === "" || emp.department === selectedDept;
 
-    const min = minSalary ? Number(minSalary) : 0;
-    const max = maxSalary ? Number(maxSalary) : Infinity;
+      const statusFilter =
+        selectedStatus === "" || emp.status === selectedStatus;
 
-    const salaryFilter = Number(emp.salary) >= min && Number(emp.salary) <= max;
+      const salaryFilter =
+        Number(emp.salary) >= min && Number(emp.salary) <= max;
 
-    return deptFilter && statusFilter && salaryFilter;
-  });
-  if (filteredData.length === 0) {
-    document.getElementById("emptyMsg").textContent = "No matching Data Found!";
+      return deptFilter && statusFilter && salaryFilter;
+    });
+
+    if (filteredData.length === 0) {
+      document.getElementById("emptyMsg").textContent =
+        "No matching Data Found!";
+    }
+
+    currentDisplayData = filteredData;
+    renderEmpTable(filteredData);
   }
-
-  currentDisplayData = filteredData;
-  renderEmpTable(filteredData);
 };
 
 const sortEmpSalary = () => {
@@ -242,37 +264,59 @@ const sortEmpDate = () => {
   renderEmpTable(currentDisplayData);
 };
 
+const exportToCsv = () => {
+  if (employeeData.length !== 0) {
+    let csv = [];
+    const rows = document.querySelectorAll("tr");
+
+    rows.forEach((i) => {
+      let cols = i.querySelectorAll("th, td");
+      let csvRow = [];
+
+      cols.forEach((j) => {
+        csvRow.push(j.textContent);
+        csvRow.splice(7, 1);
+      });
+      csv.push(csvRow.join(","));
+    });
+
+    let blob = new Blob([csv.join("\n")], { type: "text/csv" });
+    exportBtn.download = "Employee-Data";
+    exportBtn.href = URL.createObjectURL(blob);
+
+    showAcknowledgeToast("Employee Data Downloaded Succesfully.");
+  } else {
+    showWarningToast("No Employee Data Available!");
+  }
+};
+
 const validateFormInput = () => {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const nameRegex = /^[a-zA-Z][a-zA-Z\s]+$/;
+  const salaryRegex = /^[0-9]*$/;
+  const data = currentDisplayData || [];
+  const isDuplicateMail = data.find((val) => val.email === empMail.value);
 
   const isFormValid =
+    !isDuplicateMail &&
     empName.value.trim() !== "" &&
     empMail.value.trim() !== "" &&
     empDept.value.trim() !== "" &&
     empRole.value.trim() !== "" &&
     empSalary.value.trim() !== "" &&
     empJoinDate.value.trim() !== "" &&
-    emailRegex.test(empMail.value);
+    emailRegex.test(empMail.value) &&
+    nameRegex.test(empName.value) &&
+    emailRegex.test(empMail.value) &&
+    salaryRegex.test(empSalary.value);
 
   submitBtn.disabled = !isFormValid;
-};
 
-const exportToCsv = () => {
-  let csv = [];
-  const rows = document.querySelectorAll("tr");
+  const validEmailCheck = emailRegex.test(empMail.value);
 
-  rows.forEach((i) => {
-    let cols = i.querySelectorAll("th, td");
-    let csvRow = [];
-
-    cols.forEach((j) => {
-      csvRow.push(j.textContent);
-      csvRow.splice(7, 1);
-    });
-    csv.push(csvRow.join(","));
-  });
-
-  let blob = new Blob([csv.join("\n")], { type: "text/csv" });
-  exportBtn.download = "Employee-Data";
-  exportBtn.href = URL.createObjectURL(blob);
+  if (!isDuplicateMail && validEmailCheck) {
+    document.querySelector(".invalidMail").classList.add("d-none");
+  } else {
+    document.querySelector(".invalidMail").classList.remove("d-none");
+  }
 };

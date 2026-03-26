@@ -11,6 +11,15 @@
     height: 300px;
 }
 
+.empData .mainContent .form-label:after {
+    content: " *";
+    color: red;
+}
+
 .cursor-pointer {
     cursor: pointer;
+}
+
+.font-14 {
+    font-size: 14px;
 }
