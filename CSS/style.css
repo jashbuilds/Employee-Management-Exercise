@@ -1,10 +1,25 @@
+:root{
+    --color-light-sky: #d3e3ffb1;
+    --color-red: red;
+    --color-gray: gray;
+    --color-light-gray: rgba(158, 155, 155, 0.4);
+    --color-light-green: rgba(25, 135, 84, 0.2)
+}
+
 .empData {
     font-family: 'Montserrat', sans-serif;
+    background: url('../Images/OC3WJG0.jpg') no-repeat fixed;
+    background-size: 100% 100%;
 }
 
 .empData .empLogo:focus {
     outline: none;
     border: none;
+}
+
+.empData .exportBtn:hover {
+    background-color: var(--color-light-green);
+    transition: background-color 0.3s ease-in;
 }
 
 .empData .mainContent .emptyDataMsgField {
@@ -13,7 +28,7 @@
 
 .empData .mainContent .form-label:after {
     content: " *";
-    color: red;
+    color: var(--color-red);
 }
 
 .empData .mainContent .form-label.field-filled:after {
@@ -30,10 +45,21 @@
 
 #minSal~.invalid-feedback,
 #maxSal~.invalid-feedback {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    white-space: nowrap;
+    white-space: nowrap; 
     font-size: 0.8rem;
     margin-top: 2px;
+}
+
+select:required:invalid {
+    color: var(--color-gray);
+}
+
+#submitBtn:disabled {
+    cursor: not-allowed;
+    pointer-events: all !important;
+}
+
+.empData .navbar {
+    background: var(--color-light-gray);
+    backdrop-filter: blur(10px);
 }

@@ -55,7 +55,7 @@ statusToggle.addEventListener("change", () => {
   statusMsg.innerHTML = statusToggle.checked ? "Active" : "Inactive";
 });
 
-// Render whole table content when called with target data
+// Function Render whole table content when called with target data
 const renderEmpTable = (data) => {
   if (data.length === 0) {
     emptyDataMsg.classList.remove("d-none");
@@ -77,8 +77,8 @@ const renderEmpTable = (data) => {
                             <td class="align-content-center">${emp.joiningDate}</td>
                             <td class="align-content-center"><span class="badge rounded-pill statusBadge">${emp.status}</span></td>
                             <td class="d-flex align-items-center justify-content-center gap-3">
-                              <button type="button" class="btn btn-primary btn-sm" onclick="return editEmployee('${emp.email}')"><img src="../Icons/edit-btn.svg" alt="edit-button" width="16" height="14"></button>
-                              <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" onclick="confirmDelete('${emp.email}')"><img src="../Icons/delete-btn.svg" alt="delete-button" width="16" height="14"></button>
+                              <span class="cursor-pointer py-2" onclick="return editEmployee('${emp.email}')"><img src="../Icons/edit-btn.svg" alt="edit-button" width="20" height="20" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit"></span>
+                              <span class="cursor-pointer py-2" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" onclick="return confirmDelete('${emp.email}')"><img src="../Icons/delete-btn.svg" alt="delete-button" width="20" height="20" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete"></span>
                             </td>
                           </tr>`,
     )
@@ -98,7 +98,7 @@ const renderEmpTable = (data) => {
   });
 };
 
-// Logic to Add employee in table
+// Function to Add employee in table
 const addEmployee = (e) => {
   e.preventDefault();
   const formObj = {
@@ -128,7 +128,7 @@ const addEmployee = (e) => {
   empFormFields.reset();
 };
 
-// Logic to Edit employee in table
+// Function to Edit employee in table
 const editEmployee = (email) => {
   modalHeading.textContent = "Update Employee";
   const employee = employeeData.find((emp) => emp.email === email);
@@ -159,20 +159,20 @@ employeeForm.addEventListener("hidden.bs.modal", () => {
   submitBtn.disabled = true;
   empFormFields.reset();
   empMail.classList.remove("is-invalid");
-  document.querySelectorAll(".form-label.field-filled").forEach(label => {
+  document.querySelectorAll(".form-label.field-filled").forEach((label) => {
     label.classList.remove("field-filled");
   });
 });
 
-// Delete confirmation logic
+// Function confirmation logic
 const confirmDelete = (email) => {
   document.getElementById("deleteConfirm").innerHTML =
-    `<button type="button" class="btn btn-secondary"
+    `<button type="button" class="btn btn-outline-secondary"
                                 data-bs-dismiss="modal">No</button>
                                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="return deleteEmployee('${email}')">Yes</button>`;
 };
 
-// Logic to Delete employee from Table
+// Function to Delete employee from Table
 const deleteEmployee = (email) => {
   const employee = employeeData.find((emp) => emp.email === email);
   const position = employeeData.indexOf(employee);
@@ -192,7 +192,7 @@ const deleteEmployee = (email) => {
 currentDisplayData = [...employeeData];
 renderEmpTable(employeeData);
 
-// Logic for Search Functionality
+// Function for Search Functionality
 const searchEmpData = () => {
   const searchBox = document.getElementById("searchBox");
   const searchValue = searchBox?.value?.toLowerCase() || "";
@@ -211,7 +211,7 @@ const searchEmpData = () => {
   renderEmpTable(filteredData);
 };
 
-// Logic to Filter all 3 fields
+// Function to Filter all 3 fields
 const filterEmpData = () => {
   const selectedDept = document.getElementById("departmentDropDown").value;
   const selectedStatus = document.getElementById("statusDropDown").value;
@@ -248,7 +248,7 @@ const filterEmpData = () => {
   }
 };
 
-// Logic to Sort table data by Salary
+// Function to Sort table data by Salary
 const sortEmpSalary = () => {
   currentDisplayData.sort((a, b) => {
     if (salaryAsc) {
@@ -266,7 +266,7 @@ const sortEmpSalary = () => {
   renderEmpTable(currentDisplayData);
 };
 
-// Logic to Sort table data by Joining Date
+// Function to Sort table data by Joining Date
 const sortEmpDate = () => {
   currentDisplayData.sort((a, b) => {
     if (dateAsc) {
@@ -284,7 +284,7 @@ const sortEmpDate = () => {
   renderEmpTable(currentDisplayData);
 };
 
-// Logic to export Table Data in csv format
+// Function to export Table Data in csv format
 const exportToCsv = () => {
   if (employeeData.length !== 0) {
     let csv = [];
@@ -311,25 +311,35 @@ const exportToCsv = () => {
   }
 };
 
-// Logic to validate Email Input
+// Function to validate Email Input
 const validateEmail = () => {
   const isDuplicateMail = employeeData.find(
-    (val, idx) => val.email === empMail.value && idx !== editingIndex
+    (val, idx) => val.email === empMail.value && idx !== editingIndex,
   );
   const isValidFormat = EMAIL_REGEX.test(empMail.value);
 
-  if (isValidFormat && !isDuplicateMail) {
+  if ((isValidFormat && !isDuplicateMail) || empMail.value.trim() === "") {
     empMail.classList.remove("is-invalid");
   } else {
     empMail.classList.add("is-invalid");
+    submitBtn.disabled = true;
   }
 };
 
+// Function to prevent empty space at starting of the name or just empty space
+const validateName = () => {
+  if (/^\s/.test(empName.value)) {
+    empName.classList.add("is-invalid");
+    submitBtn.disabled = true;
+  } else {
+    empName.classList.remove("is-invalid");
+  }
+};
 
-// Logic to validate Form Input fields
+// Function to validate Form Input fields
 const validateFormInput = () => {
   const isDuplicateMail = employeeData.find(
-    (val, idx) => val.email === empMail.value && idx !== editingIndex
+    (val, idx) => val.email === empMail.value && idx !== editingIndex,
   );
 
   const isFormValid =
@@ -345,13 +355,14 @@ const validateFormInput = () => {
     SALARY_REGEX.test(empSalary.value);
 
   submitBtn.disabled = !isFormValid;
+
   updateRequiredIndicators();
 };
 
-// Logic to remove asterisk sign when user type in input fields
+// Function to remove asterisk sign when user type in input fields
 const updateRequiredIndicators = () => {
   const fields = [empName, empMail, empDept, empRole, empSalary, empJoinDate];
-  fields.forEach(field => {
+  fields.forEach((field) => {
     const label = document.querySelector(`label[for="${field.id}"]`);
     if (label) {
       if (field.value.trim() !== "") {
