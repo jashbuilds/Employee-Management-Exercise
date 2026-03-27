@@ -28,6 +28,7 @@ let dateAsc = true;
 let currentDisplayData = [];
 let editingIndex = -1;
 
+// Toast message for add/edit
 const showAcknowledgeToast = (message) => {
   const toastContainer = document.getElementById("notificationToast");
   const toastBody = toastContainer.querySelector(".toast-message");
@@ -38,6 +39,7 @@ const showAcknowledgeToast = (message) => {
   toast.show();
 };
 
+// Toast message for delete
 const showWarningToast = (message) => {
   const toastContainer = document.getElementById("deleteToast");
   const toastBody = toastContainer.querySelector(".delete-message");
@@ -48,10 +50,12 @@ const showWarningToast = (message) => {
   toast.show();
 };
 
+// Toggle button text at Add Employee Form Modal
 statusToggle.addEventListener("change", () => {
   statusMsg.innerHTML = statusToggle.checked ? "Active" : "Inactive";
 });
 
+// Render whole table content when called with target data
 const renderEmpTable = (data) => {
   if (data.length === 0) {
     emptyDataMsg.classList.remove("d-none");
@@ -82,6 +86,7 @@ const renderEmpTable = (data) => {
 
   const empStatus = document.querySelectorAll(".statusBadge");
 
+  // Change status badge background according to status value
   empStatus.forEach((val) => {
     if (val.textContent === "Active") {
       val.classList.add("text-bg-success");
@@ -93,6 +98,7 @@ const renderEmpTable = (data) => {
   });
 };
 
+// Logic to Add employee in table
 const addEmployee = (e) => {
   e.preventDefault();
   const formObj = {
@@ -122,6 +128,7 @@ const addEmployee = (e) => {
   empFormFields.reset();
 };
 
+// Logic to Edit employee in table
 const editEmployee = (email) => {
   modalHeading.textContent = "Update Employee";
   const employee = employeeData.find((emp) => emp.email === email);
@@ -144,6 +151,7 @@ const editEmployee = (email) => {
   editModal.show();
 };
 
+// Reset particular values when Modal Hides
 employeeForm.addEventListener("hidden.bs.modal", () => {
   modalHeading.textContent = "Add Employee";
   editingIndex = -1;
@@ -156,6 +164,7 @@ employeeForm.addEventListener("hidden.bs.modal", () => {
   });
 });
 
+// Delete confirmation logic
 const confirmDelete = (email) => {
   document.getElementById("deleteConfirm").innerHTML =
     `<button type="button" class="btn btn-secondary"
@@ -163,6 +172,7 @@ const confirmDelete = (email) => {
                                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="return deleteEmployee('${email}')">Yes</button>`;
 };
 
+// Logic to Delete employee from Table
 const deleteEmployee = (email) => {
   const employee = employeeData.find((emp) => emp.email === email);
   const position = employeeData.indexOf(employee);
@@ -182,6 +192,7 @@ const deleteEmployee = (email) => {
 currentDisplayData = [...employeeData];
 renderEmpTable(employeeData);
 
+// Logic for Search Functionality
 const searchEmpData = () => {
   const searchBox = document.getElementById("searchBox");
   const searchValue = searchBox?.value?.toLowerCase() || "";
@@ -200,6 +211,7 @@ const searchEmpData = () => {
   renderEmpTable(filteredData);
 };
 
+// Logic to Filter all 3 fields
 const filterEmpData = () => {
   const selectedDept = document.getElementById("departmentDropDown").value;
   const selectedStatus = document.getElementById("statusDropDown").value;
@@ -236,6 +248,7 @@ const filterEmpData = () => {
   }
 };
 
+// Logic to Sort table data by Salary
 const sortEmpSalary = () => {
   currentDisplayData.sort((a, b) => {
     if (salaryAsc) {
@@ -253,6 +266,7 @@ const sortEmpSalary = () => {
   renderEmpTable(currentDisplayData);
 };
 
+// Logic to Sort table data by Joining Date
 const sortEmpDate = () => {
   currentDisplayData.sort((a, b) => {
     if (dateAsc) {
@@ -270,6 +284,7 @@ const sortEmpDate = () => {
   renderEmpTable(currentDisplayData);
 };
 
+// Logic to export Table Data in csv format
 const exportToCsv = () => {
   if (employeeData.length !== 0) {
     let csv = [];
@@ -296,6 +311,7 @@ const exportToCsv = () => {
   }
 };
 
+// Logic to validate Email Input
 const validateEmail = () => {
   const isDuplicateMail = employeeData.find(
     (val, idx) => val.email === empMail.value && idx !== editingIndex
@@ -309,6 +325,8 @@ const validateEmail = () => {
   }
 };
 
+
+// Logic to validate Form Input fields
 const validateFormInput = () => {
   const isDuplicateMail = employeeData.find(
     (val, idx) => val.email === empMail.value && idx !== editingIndex
@@ -330,6 +348,7 @@ const validateFormInput = () => {
   updateRequiredIndicators();
 };
 
+// Logic to remove asterisk sign when user type in input fields
 const updateRequiredIndicators = () => {
   const fields = [empName, empMail, empDept, empRole, empSalary, empJoinDate];
   fields.forEach(field => {
