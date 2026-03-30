@@ -1,15 +1,15 @@
-:root{
+:root {
     --color-light-sky: #d3e3ffb1;
     --color-red: red;
     --color-gray: gray;
-    --color-light-gray: rgba(158, 155, 155, 0.4);
-    --color-light-green: rgba(25, 135, 84, 0.2)
+    --color-light-gray: rgba(49, 184, 116, 0.4);
+    --color-light-blue: rgba(10, 177, 206, 0.3);
 }
 
 .empData {
     font-family: 'Montserrat', sans-serif;
-    background: url('../Images/OC3WJG0.jpg') no-repeat fixed;
-    background-size: 100% 100%;
+    background: linear-gradient(100deg, rgb(251, 250, 210) 11.2%, rgba(163, 230, 255, 1) 91.1%) fixed no-repeat;
+    background-size: 100%;
 }
 
 .empData .empLogo:focus {
@@ -18,7 +18,7 @@
 }
 
 .empData .exportBtn:hover {
-    background-color: var(--color-light-green);
+    background-color: var(--color-light-blue);
     transition: background-color 0.3s ease-in;
 }
 
@@ -39,13 +39,19 @@
     cursor: pointer;
 }
 
+.statusColToggle {
+    width: 36px !important;
+    height: 20px;
+    cursor: pointer;
+}
+
 .font-14 {
     font-size: 14px;
 }
 
 #minSal~.invalid-feedback,
 #maxSal~.invalid-feedback {
-    white-space: nowrap; 
+    white-space: nowrap;
     font-size: 0.8rem;
     margin-top: 2px;
 }
@@ -60,6 +66,6 @@ select:required:invalid {
 }
 
 .empData .navbar {
-    background: var(--color-light-gray);
+    /* background: var(--color-light-gray); */
     backdrop-filter: blur(10px);
 }

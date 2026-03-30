@@ -16,6 +16,7 @@ const exportBtn = document.getElementById("exportBtn");
 const employeeForm = document.getElementById("employeeForm");
 const modalHeading = document.getElementById("employeeModalLabel");
 const deleteConfirmModal = document.getElementById("deleteConfirmationModal");
+const statusColToggle = document.querySelector(".statusColToggle");
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const NAME_REGEX = /^[a-zA-Z][a-zA-Z\s]+$/;
@@ -75,7 +76,15 @@ const renderEmpTable = (data) => {
                             <td class="align-content-center">${emp.role}</td>
                             <td class="align-content-center">${emp.salary}</td>
                             <td class="align-content-center">${emp.joiningDate}</td>
-                            <td class="align-content-center"><span class="badge rounded-pill statusBadge">${emp.status}</span></td>
+                            <td class="align-content-center">
+                                              <div class="form-check form-switch d-flex justify-content-center">
+                                                <input onchange="return changeToggleStatus('${emp.email}')"
+                                                    class="form-check-input cursor-pointer statusColToggle"
+                                                    type="checkbox"
+                                                    role="switch" switch ${emp.status === "Active" ? "checked" : ""}>
+                                                <p class="d-none">${emp.status}</p> <!-- Hidden text to show status in csv file -->
+                                              </div>
+                            </td>
                             <td class="d-flex align-items-center justify-content-center gap-3">
                               <span class="cursor-pointer py-2" onclick="return editEmployee('${emp.email}')"><img src="../Icons/edit-btn.svg" alt="edit-button" width="20" height="20" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit"></span>
                               <span class="cursor-pointer py-2" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" onclick="return confirmDelete('${emp.email}')"><img src="../Icons/delete-btn.svg" alt="delete-button" width="20" height="20" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete"></span>
@@ -83,19 +92,17 @@ const renderEmpTable = (data) => {
                           </tr>`,
     )
     .join("");
+};
 
-  const empStatus = document.querySelectorAll(".statusBadge");
+// Function to change toggle values in Edit form when user change status from table toggle button
+const changeToggleStatus = (email) => {
+  const employeeMail = employeeData.find((emp) => emp.email === email);
 
-  // Change status badge background according to status value
-  empStatus.forEach((val) => {
-    if (val.textContent === "Active") {
-      val.classList.add("text-bg-success");
-      val.classList.remove("text-bg-danger");
-    } else {
-      val.classList.remove("text-bg-success");
-      val.classList.add("text-bg-danger");
-    }
-  });
+  employeeMail.status =
+    employeeMail.status === "Active" ? "Inactive" : "Active";
+  localStorage.setItem("EmpData", JSON.stringify(employeeData));
+
+  filterEmpData();
 };
 
 // Function to Add employee in table
@@ -108,7 +115,7 @@ const addEmployee = (e) => {
     role: empRole.value,
     salary: empSalary.value,
     joiningDate: empJoinDate.value,
-    status: statusMsg.innerHTML,
+    status: statusMsg.textContent,
   };
 
   if (editingIndex === -1) {
@@ -245,6 +252,8 @@ const filterEmpData = () => {
 
     currentDisplayData = filteredData;
     renderEmpTable(filteredData);
+
+    updateFilterPills();
   }
 };
 
@@ -252,12 +261,8 @@ const filterEmpData = () => {
 const sortEmpSalary = () => {
   currentDisplayData.sort((a, b) => {
     if (salaryAsc) {
-      document.getElementById("sortBySalary").src =
-        "../Icons/filter-arrow-down.svg";
       return Number(a.salary) - Number(b.salary);
     } else {
-      document.getElementById("sortBySalary").src =
-        "../Icons/filter-arrow-up.svg";
       return Number(b.salary) - Number(a.salary);
     }
   });
@@ -270,12 +275,8 @@ const sortEmpSalary = () => {
 const sortEmpDate = () => {
   currentDisplayData.sort((a, b) => {
     if (dateAsc) {
-      document.getElementById("sortByDate").src =
-        "../Icons/filter-arrow-down.svg";
       return new Date(a.joiningDate) - new Date(b.joiningDate);
     } else {
-      document.getElementById("sortByDate").src =
-        "../Icons/filter-arrow-up.svg";
       return new Date(b.joiningDate) - new Date(a.joiningDate);
     }
   });
@@ -288,6 +289,7 @@ const sortEmpDate = () => {
 const exportToCsv = () => {
   if (employeeData.length !== 0) {
     let csv = [];
+
     const rows = document.querySelectorAll("tr");
 
     rows.forEach((i) => {
@@ -373,3 +375,72 @@ const updateRequiredIndicators = () => {
     }
   });
 };
+
+const updateFilterPills = () => {
+  let pillsContainer = document.getElementById("filterPills");
+  pillsContainer.innerHTML = "";
+  let selectedDept = document.getElementById("departmentDropDown").value;
+  let selectedStatus = document.getElementById("statusDropDown").value;
+  let minSalary = document.getElementById("minSal").value;
+  let maxSalary = document.getElementById("maxSal").value;
+
+  const createPill = (text, removeFn) => {
+    const pill = document.createElement("span");
+    pill.innerHTML = "";
+    pill.className = "badge text-bg-secondary d-flex align-items-center cursor-pointer";
+    pill.innerHTML = `${text} <button type="button" class="btn-close btn-close-white btn-sm ms-2 pillClose" aria-label="Close"></button>`; 
+    pillsContainer.appendChild(pill) 
+    document.querySelectorAll(".pillClose").forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation()
+        removeFn()
+      })
+    })  
+    pill.onclick = removeFn;
+  }; 
+  if (selectedDept) {
+    createPill(selectedDept, () => {
+      selectedDept = "";
+      updateFilterPills();
+    });
+  }
+
+  if (selectedStatus) {
+    createPill(selectedStatus, () => {
+      selectedStatus = "";
+      updateFilterPills();
+    });
+  }
+
+  if (minSalary) {
+    createPill(`Min Salary: ${minSalary}`, () => {
+      minSalary = "";
+      updateFilterPills();
+    });
+  }
+
+  if (maxSalary) {
+    createPill(`Max Salary: ${maxSalary}`, () => {
+      maxSalary = "";
+      updateFilterPills();
+    });
+  }
+
+};
+
+document.getElementById("departmentDropDown").addEventListener("change", () => {
+  filterEmpData()
+  updateFilterPills(); 
+});
+document.getElementById("statusDropDown").addEventListener("change", () => {
+  filterEmpData()
+  updateFilterPills();
+});
+document.getElementById("minSal").addEventListener("input", () => {
+  filterEmpData()
+  updateFilterPills();
+});
+document.getElementById("maxSal").addEventListener("input", () => {
+  filterEmpData()
+  updateFilterPills();
+});
