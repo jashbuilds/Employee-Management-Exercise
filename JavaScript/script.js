@@ -1,35 +1,54 @@
-const statusMsg = document.getElementById("showStatus");
-const statusToggle = document.getElementById("statusToggle");
-const submitBtn = document.getElementById("submitBtn");
+// ============================================================================
+// EMPLOYEE MANAGEMENT APPLICATION
+// Organized Code Structure following Best Practices
+// ============================================================================
+
+// ============ 1. CONSTANTS ============
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const NAME_REGEX = /^[a-zA-Z][a-zA-Z\s]+$/;
+const SALARY_REGEX = /^[0-9]*$/;
+
+// ============ 2. DOM ELEMENTS - FORM FIELDS ============
 const empName = document.getElementById("fullName");
 const empMail = document.getElementById("email");
 const empDept = document.getElementById("department");
 const empRole = document.getElementById("role");
 const empSalary = document.getElementById("salary");
 const empJoinDate = document.getElementById("joiningDate");
+const statusToggle = document.getElementById("statusToggle");
+const statusMsg = document.getElementById("showStatus");
+
+// ============ 3. DOM ELEMENTS - BUTTONS ============
+const submitBtn = document.getElementById("submitBtn");
+const exportBtn = document.getElementById("exportBtn");
+
+// ============ 4. DOM ELEMENTS - CONTAINERS & TABLES ============
 const tableBody = document.getElementById("tableBody");
-const empFormFields = document.getElementById("empForm");
 const empTable = document.getElementById("empTable");
 const emptyDataMsg = document.querySelector(".emptyDataMsgField");
-const interactFields = document.querySelector(".interactFields");
-const exportBtn = document.getElementById("exportBtn");
+
+// ============ 5. DOM ELEMENTS - MODALS ============
 const employeeForm = document.getElementById("employeeForm");
+const empFormFields = document.getElementById("empForm");
 const modalHeading = document.getElementById("employeeModalLabel");
 const deleteConfirmModal = document.getElementById("deleteConfirmationModal");
+
+// ============ 6. DOM ELEMENTS - FILTERS ============
+const interactFields = document.querySelector(".interactFields");
 const statusColToggle = document.querySelector(".statusColToggle");
 
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-const NAME_REGEX = /^[a-zA-Z][a-zA-Z\s]+$/;
-const SALARY_REGEX = /^[0-9]*$/;
-
+// ============ 7. STATE / APPLICATION DATA ============
 const employeeData = JSON.parse(localStorage.getItem("EmpData")) || [];
-
-let salaryAsc = true;
-let dateAsc = true;
 let currentDisplayData = [];
 let editingIndex = -1;
+let salaryAsc = true;
+let dateAsc = true;
 
-// Toast message for add/edit
+// ============================================================================
+// ============ 8. UTILITY FUNCTIONS ============
+// ============================================================================
+
+// Display toast notification for successful add/edit operations
 const showAcknowledgeToast = (message) => {
   const toastContainer = document.getElementById("notificationToast");
   const toastBody = toastContainer.querySelector(".toast-message");
@@ -40,7 +59,7 @@ const showAcknowledgeToast = (message) => {
   toast.show();
 };
 
-// Toast message for delete
+// Display toast notification for delete operations
 const showWarningToast = (message) => {
   const toastContainer = document.getElementById("deleteToast");
   const toastBody = toastContainer.querySelector(".delete-message");
@@ -51,12 +70,11 @@ const showWarningToast = (message) => {
   toast.show();
 };
 
-// Toggle button text at Add Employee Form Modal
-statusToggle.addEventListener("change", () => {
-  statusMsg.innerHTML = statusToggle.checked ? "Active" : "Inactive";
-});
+// ============================================================================
+// ============ 9. DISPLAY / RENDERING FUNCTIONS ============
+// ============================================================================
 
-// Function Render whole table content when called with target data
+// Render employee table with given data
 const renderEmpTable = (data) => {
   if (data.length === 0) {
     emptyDataMsg.classList.remove("d-none");
@@ -94,18 +112,99 @@ const renderEmpTable = (data) => {
     .join("");
 };
 
-// Function to change toggle values in Edit form when user change status from table toggle button
-const changeToggleStatus = (email) => {
-  const employeeMail = employeeData.find((emp) => emp.email === email);
+// Update filter pills display based on current filters
+const updateFilterPills = () => {
+  let pillsContainer = document.getElementById("filterPills");
+  pillsContainer.innerHTML = "";
+  let selectedDept = document.getElementById("departmentDropDown").value;
+  let selectedStatus = document.getElementById("statusDropDown").value;
+  let minSalary = document.getElementById("minSal").value;
+  let maxSalary = document.getElementById("maxSal").value;
 
-  employeeMail.status =
-    employeeMail.status === "Active" ? "Inactive" : "Active";
-  localStorage.setItem("EmpData", JSON.stringify(employeeData));
+  // Helper function to create individual pill
+  const createPill = (text, removeFn) => {
+    const pill = document.createElement("span");
+    pill.innerHTML = "";
+    pill.className =
+      "badge text-bg-secondary d-flex align-items-center cursor-pointer";
+    pill.innerHTML = `${text} <button type="button" class="btn-close btn-close-white btn-sm ms-2 pillClose" aria-label="Close"></button>`;
+    pillsContainer.appendChild(pill);
+    pill.querySelector("button").onclick = removeFn;
+  };
 
-  filterEmpData();
+  // Create department pill
+  if (selectedDept) {
+    createPill(selectedDept, () => {
+      document.getElementById("departmentDropDown").value = "";
+      filterEmpData();
+      updateFilterPills();
+    });
+  }
+
+  // Create status pill
+  if (selectedStatus) {
+    createPill(selectedStatus, () => {
+      document.getElementById("statusDropDown").value = "";
+      filterEmpData();
+      updateFilterPills();
+    });
+  }
+
+  // Create minimum salary pill
+  if (minSalary) {
+    createPill(`Min Salary: ${minSalary}`, () => {
+      document.getElementById("minSal").value = "";
+      filterEmpData();
+      updateFilterPills();
+    });
+  }
+
+  // Create maximum salary pill
+  if (maxSalary) {
+    createPill(`Max Salary: ${maxSalary}`, () => {
+      document.getElementById("maxSal").value = "";
+      filterEmpData();
+      updateFilterPills();
+    });
+  }
+
+  // Check if any filter is active
+  const hasActiveFilters =
+    selectedDept || selectedStatus || minSalary || maxSalary;
+
+  // Create "Clear All" pill if any filter is active
+  if (hasActiveFilters) {
+    createPill("Clear All", () => {
+      document.getElementById("departmentDropDown").value = "";
+      document.getElementById("statusDropDown").value = "";
+      document.getElementById("minSal").value = "";
+      document.getElementById("maxSal").value = "";
+      filterEmpData();
+      updateFilterPills();
+    });
+  }
 };
 
-// Function to Add employee in table
+// Update required field indicators (asterisks on labels)
+const updateRequiredIndicators = () => {
+  const fields = [empName, empMail, empDept, empRole, empSalary, empJoinDate];
+  fields.forEach((field) => {
+    const label = document.querySelector(`label[for="${field.id}"]`);
+    if (label) {
+      if (field.value.trim() !== "") {
+        label.classList.add("field-filled");
+      } else {
+        label.classList.remove("field-filled");
+      }
+    }
+  });
+};
+
+// ============================================================================
+// ============ 10. DATA OPERATIONS (CRUD) ============
+// ============================================================================
+
+// Add new employee or update existing employee
 const addEmployee = (e) => {
   e.preventDefault();
   const formObj = {
@@ -119,9 +218,11 @@ const addEmployee = (e) => {
   };
 
   if (editingIndex === -1) {
+    // Adding new employee
     employeeData.push(formObj);
     showAcknowledgeToast("Employee Added Successfully.");
   } else {
+    // Updating existing employee
     employeeData[editingIndex] = formObj;
     editingIndex = -1;
     showAcknowledgeToast("Employee Updated Successfully.");
@@ -135,7 +236,7 @@ const addEmployee = (e) => {
   empFormFields.reset();
 };
 
-// Function to Edit employee in table
+// Populate form for editing an employee
 const editEmployee = (email) => {
   modalHeading.textContent = "Update Employee";
   const employee = employeeData.find((emp) => emp.email === email);
@@ -158,28 +259,7 @@ const editEmployee = (email) => {
   editModal.show();
 };
 
-// Reset particular values when Modal Hides
-employeeForm.addEventListener("hidden.bs.modal", () => {
-  modalHeading.textContent = "Add Employee";
-  editingIndex = -1;
-  submitBtn.textContent = "Submit";
-  submitBtn.disabled = true;
-  empFormFields.reset();
-  empMail.classList.remove("is-invalid");
-  document.querySelectorAll(".form-label.field-filled").forEach((label) => {
-    label.classList.remove("field-filled");
-  });
-});
-
-// Function confirmation logic
-const confirmDelete = (email) => {
-  document.getElementById("deleteConfirm").innerHTML =
-    `<button type="button" class="btn btn-outline-secondary"
-                                data-bs-dismiss="modal">No</button>
-                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="return deleteEmployee('${email}')">Yes</button>`;
-};
-
-// Function to Delete employee from Table
+// Delete employee from data and update display
 const deleteEmployee = (email) => {
   const employee = employeeData.find((emp) => emp.email === email);
   const position = employeeData.indexOf(employee);
@@ -196,10 +276,30 @@ const deleteEmployee = (email) => {
   }
 };
 
-currentDisplayData = [...employeeData];
-renderEmpTable(employeeData);
+// Setup delete confirmation modal with callback
+const confirmDelete = (email) => {
+  document.getElementById("deleteConfirm").innerHTML =
+    `<button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="return deleteEmployee('${email}')">Yes</button>`;
+};
 
-// Function for Search Functionality
+// Toggle employee status (Active/Inactive)
+const changeToggleStatus = (email) => {
+  const employeeMail = employeeData.find((emp) => emp.email === email);
+
+  employeeMail.status =
+    employeeMail.status === "Active" ? "Inactive" : "Active";
+  localStorage.setItem("EmpData", JSON.stringify(employeeData));
+
+  filterEmpData();
+};
+
+// ============================================================================
+// ============ 11. SEARCH & FILTERING ============
+// ============================================================================
+
+// Search employees by name, email, or role
 const searchEmpData = () => {
   const searchBox = document.getElementById("searchBox");
   const searchValue = searchBox?.value?.toLowerCase() || "";
@@ -218,7 +318,7 @@ const searchEmpData = () => {
   renderEmpTable(filteredData);
 };
 
-// Function to Filter all 3 fields
+// Filter employees by department, status, and salary range
 const filterEmpData = () => {
   const selectedDept = document.getElementById("departmentDropDown").value;
   const selectedStatus = document.getElementById("statusDropDown").value;
@@ -257,7 +357,11 @@ const filterEmpData = () => {
   }
 };
 
-// Function to Sort table data by Salary
+// ============================================================================
+// ============ 12. SORTING ============
+// ============================================================================
+
+// Sort employees by salary (ascending/descending)
 const sortEmpSalary = () => {
   currentDisplayData.sort((a, b) => {
     if (salaryAsc) {
@@ -271,7 +375,7 @@ const sortEmpSalary = () => {
   renderEmpTable(currentDisplayData);
 };
 
-// Function to Sort table data by Joining Date
+// Sort employees by joining date (ascending/descending)
 const sortEmpDate = () => {
   currentDisplayData.sort((a, b) => {
     if (dateAsc) {
@@ -285,7 +389,11 @@ const sortEmpDate = () => {
   renderEmpTable(currentDisplayData);
 };
 
-// Function to export Table Data in csv format
+// ============================================================================
+// ============ 13. EXPORT ============
+// ============================================================================
+
+// Export employee data as CSV file
 const exportToCsv = () => {
   if (employeeData.length !== 0) {
     let csv = [];
@@ -313,7 +421,11 @@ const exportToCsv = () => {
   }
 };
 
-// Function to validate Email Input
+// ============================================================================
+// ============ 14. VALIDATION ============
+// ============================================================================
+
+// Validate email format and check for duplicates
 const validateEmail = () => {
   const isDuplicateMail = employeeData.find(
     (val, idx) => val.email === empMail.value && idx !== editingIndex,
@@ -328,7 +440,7 @@ const validateEmail = () => {
   }
 };
 
-// Function to prevent empty space at starting of the name or just empty space
+// Validate name format (no leading spaces, no numbers)
 const validateName = () => {
   if (/^\s/.test(empName.value)) {
     empName.classList.add("is-invalid");
@@ -338,7 +450,7 @@ const validateName = () => {
   }
 };
 
-// Function to validate Form Input fields
+// Validate all form input fields
 const validateFormInput = () => {
   const isDuplicateMail = employeeData.find(
     (val, idx) => val.email === empMail.value && idx !== editingIndex,
@@ -361,86 +473,56 @@ const validateFormInput = () => {
   updateRequiredIndicators();
 };
 
-// Function to remove asterisk sign when user type in input fields
-const updateRequiredIndicators = () => {
-  const fields = [empName, empMail, empDept, empRole, empSalary, empJoinDate];
-  fields.forEach((field) => {
-    const label = document.querySelector(`label[for="${field.id}"]`);
-    if (label) {
-      if (field.value.trim() !== "") {
-        label.classList.add("field-filled");
-      } else {
-        label.classList.remove("field-filled");
-      }
-    }
+// ============================================================================
+// ============ 15. EVENT LISTENERS ============
+// ============================================================================
+
+// Handle status toggle change in form
+statusToggle.addEventListener("change", () => {
+  statusMsg.innerHTML = statusToggle.checked ? "Active" : "Inactive";
+});
+
+// Reset form when modal closes
+employeeForm.addEventListener("hidden.bs.modal", () => {
+  modalHeading.textContent = "Add Employee";
+  editingIndex = -1;
+  submitBtn.textContent = "Submit";
+  submitBtn.disabled = true;
+  empFormFields.reset();
+  empMail.classList.remove("is-invalid");
+  document.querySelectorAll(".form-label.field-filled").forEach((label) => {
+    label.classList.remove("field-filled");
   });
-};
+});
 
-const updateFilterPills = () => {
-  let pillsContainer = document.getElementById("filterPills");
-  pillsContainer.innerHTML = "";
-  let selectedDept = document.getElementById("departmentDropDown").value;
-  let selectedStatus = document.getElementById("statusDropDown").value;
-  let minSalary = document.getElementById("minSal").value;
-  let maxSalary = document.getElementById("maxSal").value;
-
-  const createPill = (text, removeFn) => {
-    const pill = document.createElement("span");
-    pill.innerHTML = "";
-    pill.className = "badge text-bg-secondary d-flex align-items-center cursor-pointer";
-    pill.innerHTML = `${text} <button type="button" class="btn-close btn-close-white btn-sm ms-2 pillClose" aria-label="Close"></button>`; 
-    pillsContainer.appendChild(pill) 
-    document.querySelectorAll(".pillClose").forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation()
-        removeFn()
-      })
-    })  
-    pill.onclick = removeFn;
-  }; 
-  if (selectedDept) {
-    createPill(selectedDept, () => {
-      selectedDept = "";
-      updateFilterPills();
-    });
-  }
-
-  if (selectedStatus) {
-    createPill(selectedStatus, () => {
-      selectedStatus = "";
-      updateFilterPills();
-    });
-  }
-
-  if (minSalary) {
-    createPill(`Min Salary: ${minSalary}`, () => {
-      minSalary = "";
-      updateFilterPills();
-    });
-  }
-
-  if (maxSalary) {
-    createPill(`Max Salary: ${maxSalary}`, () => {
-      maxSalary = "";
-      updateFilterPills();
-    });
-  }
-
-};
-
+// Handle department filter change
 document.getElementById("departmentDropDown").addEventListener("change", () => {
-  filterEmpData()
-  updateFilterPills(); 
+  filterEmpData();
+  updateFilterPills();
 });
+
+// Handle status filter change
 document.getElementById("statusDropDown").addEventListener("change", () => {
-  filterEmpData()
+  filterEmpData();
   updateFilterPills();
 });
+
+// Handle minimum salary filter change
 document.getElementById("minSal").addEventListener("input", () => {
-  filterEmpData()
+  filterEmpData();
   updateFilterPills();
 });
+
+// Handle maximum salary filter change
 document.getElementById("maxSal").addEventListener("input", () => {
-  filterEmpData()
+  filterEmpData();
   updateFilterPills();
 });
+
+// ============================================================================
+// ============ 16. INITIALIZATION ============
+// ============================================================================
+
+// Load and display initial data
+currentDisplayData = [...employeeData];
+renderEmpTable(employeeData);
