@@ -16,7 +16,7 @@
             rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net">
         <link rel="stylesheet" href="../CSS/style.css">
-        <link rel="shortcut icon" href="../Icons/employee-icon.png"
+        <link rel="shortcut icon" href="../Images/employee-icon.png"
             type="image/x-icon">
 
         <title>Employee Management</title>
@@ -39,31 +39,32 @@
             <a
                 class="exportBtn cursor-pointer ms-auto py-2 px-3 rounded-3 text-dark-emphasis fw-medium text-decoration-none d-flex gap-2 align-items-center justify-content-center"
                 onclick="exportToCsv()" id="exportBtn">Export<img
-                    src="../Icons/sheets.png" alt="download-icon"
+                    src="../Images/sheets.png" alt="download-icon"
                     width="20" height="20"></a>
 
             <!-- Add Employee Button -->
             <button
-                class="btn btn-success bg-gradient me-4 border-0 fw-medium rounded-3 d-flex justify-content-center align-items-center gap-2 py-2 px-3"
+                class="btn bg-success bg-gradient opacity-75 text-white me-4 border-0 fw-medium rounded-3 d-flex justify-content-center align-items-center gap-2 py-2 px-3"
                 data-bs-toggle="modal" data-bs-target="#employeeForm"
                 type="submit"><img src="../Icons/add-icon.svg"
-                    alt="add-employee-icon" width="18" height="18">Add Employee</button>
+                    alt="add-employee-icon" width="18" height="18">Add
+                Employee</button>
         </div>
 
         <main
-            class="mainContent border border-start-1 rounded-4 my-5 mx-4 shadow bg-light">
+            class="mainContent border border-start-1 rounded-4 mt-4 mx-4 mb-5 shadow bg-light">
 
             <!-- Search & Filter Fields -->
             <div
-                class="row g-3 align-items-center mb-4 mx-1 mx-md-2 mt-4 interactFields">
+                class="row position-relative g-3 align-items-center mb-5 mx-1 mx-md-2 mt-4 interactFields">
 
                 <!-- Search Input -->
                 <div
                     class="col-12 col-xl-4 order-last order-xl-first">
                     <div
-                        class="input-group overflow-hidden rounded-4 mt-4 mt-xl-0">
+                        class="input-group overflow-hidden rounded-3 mt-4 mt-xl-0">
                         <span
-                            class="input-group-text bg-body-secondary rounded-start-4">
+                            class="input-group-text bg-body-secondary rounded-start-3">
                             <img src="../Icons/search.svg" class="img-fluid"
                                 alt="search-icon" width="16" height="16">
                         </span>
@@ -135,18 +136,24 @@
                             > Min!</div>
                     </div>
                 </div>
+                <!-- Filter pills container -->
+                <div
+                    class="d-flex flex-wrap gap-3 mx-2 position-absolute top-100 start-0"
+                    id="filterPills"></div>
             </div>
 
-            <!-- Filter pills container -->
-            <div class="d-flex flex-wrap gap-3 mx-3" id="filterPills"></div>
-
             <!-- Employee Data Table -->
-            <div class="mx-3 my-5 text-nowrap" id="empTable">
+            <div class="mx-3 my-5 pt-4 text-nowrap" id="empTable">
                 <div class="table-responsive-xl">
                     <table
                         class="table table-hover text-center fs-6 mb-0">
                         <thead class="table-success border-bottom-0">
                             <tr class="fw-semibold border">
+                                <th scope="col"
+                                    onchange="return selectAllRows(this)">
+                                    <input type="checkbox" name="selectAllRows"
+                                        class="selectAllRows">
+                                </th>
                                 <th scope="col"
                                     class="text-light-emphasis">Name</th>
                                 <th scope="col"
@@ -189,6 +196,12 @@
                         alt="exclamation-sign" width="16" height="16">
                     <p class="m-0 text-body-tertiary" id="emptyMsg">No
                         Employee Data Available!</p>
+                </div>
+                <div>
+                    <button class="btn btn-outline-danger d-flex my-3 ms-auto d-none"
+                        id="deleteRecords"
+                        onclick="return deleteRecords()">Delete
+                        Selected</button>
                 </div>
             </div>
 
@@ -306,22 +319,29 @@
                                             </div>
                                         </div>
                                         <div
-                                            class="col-lg-4 d-flex align-items-center justify-content-start justify-content-lg-center py-3">
-                                            <label for="statusToggle">Status:
-                                                &nbsp;</label>
-                                            <div class="form-check form-switch">
-                                                <input
-                                                    class="form-check-input cursor-pointer"
-                                                    type="checkbox"
-                                                    role="switch"
-                                                    id="statusToggle" checked
-                                                    switch>
-                                                <label class="form-check-label"
-                                                    for="showStatus"
-                                                    value="Active"
-                                                    id="showStatus">Active</label>
+                                            class="col-6 col-lg-4 d-flex justify-content-start justify-content-lg-center">
+                                            <div
+                                                class="d-flex flex-column w-100">
+                                                <label
+                                                    class="mb-2">Status</label>
+                                                <div
+                                                    class="form-check form-switch gap-3 d-flex align-items-center justify-content-center border border-1 rounded-2 py-1 px-0">
+                                                    <input
+                                                        class="m-0 form-check-input border border-1 bg-light-green cursor-pointer formToggle"
+                                                        type="checkbox"
+                                                        role="switch"
+                                                        id="statusToggle"
+                                                        checked
+                                                        switch>
+                                                    <label
+                                                        class="form-check-label text-body-secondary"
+                                                        for="showStatus"
+                                                        value="Active"
+                                                        id="showStatus">Active</label>
 
+                                                </div>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -333,7 +353,8 @@
                                     <button type="submit"
                                         data-bs-dismiss="modal"
                                         onclick="addEmployee(event)"
-                                        class="btn btn-success" id="submitBtn"
+                                        class="btn bg-success bg-gradient opacity-75 text-white"
+                                        id="submitBtn"
                                         disabled>Submit</button>
                                 </div>
 
@@ -409,6 +430,7 @@
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
             crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/json2csv"></script>
         <script src="../JavaScript/script.js"></script>
 
         <script>

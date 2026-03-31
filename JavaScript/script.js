@@ -35,10 +35,14 @@ const deleteConfirmModal = document.getElementById("deleteConfirmationModal");
 
 // ============ 6. DOM ELEMENTS - FILTERS ============
 const interactFields = document.querySelector(".interactFields");
-const statusColToggle = document.querySelector(".statusColToggle");
+const statusColToggle = document.querySelectorAll(".statusColToggle");
 
 // ============ 7. STATE / APPLICATION DATA ============
-const employeeData = JSON.parse(localStorage.getItem("EmpData")) || [];
+let employeeData = JSON.parse(localStorage.getItem("EmpData")) || [];
+employeeData = employeeData.map((emp) => ({
+  ...emp,
+  selected: emp.selected || false,
+}));
 let currentDisplayData = [];
 let editingIndex = -1;
 let salaryAsc = true;
@@ -88,6 +92,9 @@ const renderEmpTable = (data) => {
     .map(
       (emp) => `
                           <tr id="empDataRow">
+                            <td class="align-content-center">
+                              <input type=checkbox name="selectRow" class="selectRow" onclick="return toggleRowSelection('${emp.email}')" ${emp.selected ? "checked" : ""} data-email="${emp.email}">
+                            </td>
                             <td class="align-content-center">${emp.fullName}</td>
                             <td class="align-content-center">${emp.email}</td>
                             <td class="align-content-center">${emp.department}</td>
@@ -95,21 +102,84 @@ const renderEmpTable = (data) => {
                             <td class="align-content-center">${emp.salary}</td>
                             <td class="align-content-center">${emp.joiningDate}</td>
                             <td class="align-content-center">
-                                              <div class="form-check form-switch d-flex justify-content-center">
-                                                <input onchange="return changeToggleStatus('${emp.email}')"
-                                                    class="form-check-input cursor-pointer statusColToggle"
-                                                    type="checkbox"
-                                                    role="switch" switch ${emp.status === "Active" ? "checked" : ""}>
-                                                <p class="d-none">${emp.status}</p> <!-- Hidden text to show status in csv file -->
-                                              </div>
+                              <div class="form-check form-switch d-flex justify-content-center">
+                                <input onchange="return changeToggleStatus('${emp.email}')"
+                                  class="form-check-input border border-1 ${emp.status === "Active" ? "bg-light-green" : ""} cursor-pointer statusColToggle" type="checkbox" role="switch" switch ${emp.status === "Active" ? "checked" : ""}>
+                                  <p class="d-none">${emp.status}</p> <!-- Hidden text to show status in csv file -->
+                              </div>
                             </td>
                             <td class="d-flex align-items-center justify-content-center gap-3">
-                              <span class="cursor-pointer py-2" onclick="return editEmployee('${emp.email}')"><img src="../Icons/edit-btn.svg" alt="edit-button" width="20" height="20" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit"></span>
-                              <span class="cursor-pointer py-2" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" onclick="return confirmDelete('${emp.email}')"><img src="../Icons/delete-btn.svg" alt="delete-button" width="20" height="20" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete"></span>
+                              <span class="cursor-pointer py-2" onclick="return editEmployee('${emp.email}')"><img src="../Icons/edit-btn.svg" alt="edit-button" width="18" height="18" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit"></span>
+                              <span class="cursor-pointer py-2" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" onclick="return confirmDelete('${emp.email}')"><img src="../Icons/delete-btn.svg" alt="delete-button" width="18" height="18" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete"></span>
                             </td>
                           </tr>`,
     )
     .join("");
+
+  // Re-initialize tooltips after rendering new content
+  const tooltipTriggerList = document.querySelectorAll(
+    '[data-bs-toggle="tooltip"]',
+  );
+  const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => {
+    new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+};
+
+// Toggle selection of individual row and update selectAll checkbox state
+const toggleRowSelection = (email) => {
+  const employee = employeeData.find((emp) => emp.email === email);
+  if (employee) {
+    employee.selected = !employee.selected;
+  }
+  const totalSelected = employeeData.filter((emp) => emp.selected).length;
+
+  const selectAllCheckBox = document.querySelector(".selectAllRows");
+  selectAllCheckBox.checked =
+    totalSelected === employeeData.length && employeeData.length > 0;
+
+  if (totalSelected > 0) {
+    document.getElementById("deleteRecords").classList.remove("d-none");
+  } else {
+    document.getElementById("deleteRecords").classList.add("d-none");
+  }
+
+  if (selectAllCheckBox.checked) {
+    selectAllCheckBox.indeterminate = false;
+  } else if (totalSelected > 0 && totalSelected < employeeData.length) {
+    selectAllCheckBox.indeterminate = true;
+  } else {
+    selectAllCheckBox.indeterminate = false;
+  }
+
+  showAcknowledgeToast(
+    `${totalSelected} of ${employeeData.length} Row(s) selected.`,
+  );
+};
+
+// logic to select or deselect all rows when selectAll checkbox is toggled
+const selectAllRows = (checkBox) => {
+  const isChecked = checkBox.querySelector("input").checked;
+  employeeData.forEach((emp) => (emp.selected = isChecked));
+
+  if (isChecked && employeeData.length > 0) {
+    showAcknowledgeToast("All Row(s) selected.");
+    document.getElementById("deleteRecords").classList.remove("d-none");
+  } else {
+    document.getElementById("deleteRecords").classList.add("d-none");
+  }
+  filterEmpData();
+  renderEmpTable(currentDisplayData);
+};
+
+// logic to delete selcted records
+const deleteRecords = () => {
+  document.getElementById("deleteRecords").classList.add("d-none");
+  employeeData = employeeData.filter((emp) => !emp.selected);
+  localStorage.setItem("EmpData", JSON.stringify(employeeData));
+  currentDisplayData = [...employeeData];
+  showWarningToast(`Selected records are deleted.`);
+  filterEmpData();
+  renderEmpTable(currentDisplayData);
 };
 
 // Update filter pills display based on current filters
@@ -255,6 +325,12 @@ const editEmployee = (email) => {
   submitBtn.disabled = false;
   submitBtn.textContent = "Update";
 
+  if (!statusToggle.checked) {
+    statusToggle.classList.remove("bg-light-green");
+  } else {
+    statusToggle.classList.add("bg-light-green");
+  }
+
   const editModal = new bootstrap.Modal(employeeForm);
   editModal.show();
 };
@@ -290,6 +366,7 @@ const changeToggleStatus = (email) => {
 
   employeeMail.status =
     employeeMail.status === "Active" ? "Inactive" : "Active";
+
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
 
   filterEmpData();
@@ -365,8 +442,10 @@ const filterEmpData = () => {
 const sortEmpSalary = () => {
   currentDisplayData.sort((a, b) => {
     if (salaryAsc) {
+      document.getElementById("sortBySalary").src = "../Icons/sort-down.svg";
       return Number(a.salary) - Number(b.salary);
     } else {
+      document.getElementById("sortBySalary").src = "../Icons/sort-up.svg";
       return Number(b.salary) - Number(a.salary);
     }
   });
@@ -379,8 +458,10 @@ const sortEmpSalary = () => {
 const sortEmpDate = () => {
   currentDisplayData.sort((a, b) => {
     if (dateAsc) {
+      document.getElementById("sortByDate").src = "../Icons/sort-down.svg";
       return new Date(a.joiningDate) - new Date(b.joiningDate);
     } else {
+      document.getElementById("sortByDate").src = "../Icons/sort-up.svg";
       return new Date(b.joiningDate) - new Date(a.joiningDate);
     }
   });
@@ -396,25 +477,11 @@ const sortEmpDate = () => {
 // Export employee data as CSV file
 const exportToCsv = () => {
   if (employeeData.length !== 0) {
-    let csv = [];
-
-    const rows = document.querySelectorAll("tr");
-
-    rows.forEach((i) => {
-      let cols = i.querySelectorAll("th, td");
-      let csvRow = [];
-
-      cols.forEach((j) => {
-        csvRow.push(j.textContent);
-      });
-      csvRow.splice(7, 1);
-      csv.push(csvRow.join(","));
-    });
-
-    let blob = new Blob([csv.join("\n")], { type: "text/csv" });
+    const csvData = json2csv.parse(employeeData);
+    csvData.slice(0, 1)
+    let blob = new Blob([csvData], { type: "text/csv" });
     exportBtn.download = "Employee-Data";
     exportBtn.href = URL.createObjectURL(blob);
-
     showAcknowledgeToast("Employee Data Downloaded Successfully.");
   } else {
     showWarningToast("No Employee Data Available!");
@@ -480,6 +547,14 @@ const validateFormInput = () => {
 // Handle status toggle change in form
 statusToggle.addEventListener("change", () => {
   statusMsg.innerHTML = statusToggle.checked ? "Active" : "Inactive";
+
+  if (statusToggle.checked) {
+    statusToggle.classList.add("bg-light-green");
+    statusMsg.value = "Active";
+  } else {
+    statusToggle.classList.remove("bg-light-green");
+    statusMsg.value = "Inactive";
+  }
 });
 
 // Reset form when modal closes
@@ -493,6 +568,13 @@ employeeForm.addEventListener("hidden.bs.modal", () => {
   document.querySelectorAll(".form-label.field-filled").forEach((label) => {
     label.classList.remove("field-filled");
   });
+  if (statusToggle.checked) {
+    statusToggle.classList.add("bg-light-green");
+    statusMsg.value = "Active";
+  } else {
+    statusToggle.classList.remove("bg-light-green");
+    statusMsg.value = "Inactive";
+  }
 });
 
 // Handle department filter change
