@@ -5,6 +5,13 @@
     --color-light-gray: rgba(49, 184, 116, 0.4);
     --color-light-blue: rgba(10, 177, 206, 0.3);
     --color-light-green: #7bd6ad;
+    --color-primary: #4eb88c;
+    --color-primary-hover: #3ca57a;
+    --color-primary-disabled: #a4e5c8;
+    --color-primary-shadow: rgba(78, 184, 140, 0.3);
+    --color-primary-hover-shadow: rgba(60, 165, 122, 0.4);
+    --color-delete: #ff6b6b;
+    --color-delete-shadow: rgba(255, 107, 107, 0.3);
 }
 
 .empData {
@@ -40,7 +47,8 @@
     cursor: pointer;
 }
 
-.empData .mainContent .statusColToggle, .empData .mainContent .formToggle {
+.empData .mainContent .statusColToggle,
+.empData .mainContent .formToggle {
     width: 36px !important;
     height: 20px;
 }
@@ -70,11 +78,53 @@ select:required:invalid {
     backdrop-filter: blur(10px);
 }
 
-.bg-light-green{
-    background-color: var(--color-light-green) !important;
+.bg-light-green {
+    background-color: var(--color-primary) !important; /* Slightly more vibrant than #7bd6ad to look active */
+    border-color: var(--color-primary) !important;
 }
 
-.empData .mainContent .selectRow, .empData .mainContent .selectAllRows {
+.bg-light-green:hover {
+    background-color: var(--color-primary-hover) !important; /* Slightly darker shade */
+    border-color: var(--color-primary-hover) !important;
+}
+
+.empData .mainContent .selectRow,
+.empData .mainContent .selectAllRows {
     width: 16px;
     height: 16px;
+}
+
+/* Custom Soft Pastel Buttons */
+.btn-primary-custom {
+    background-color: var(--color-primary); /* Slightly richer green so white text has better contrast */
+    color: white;
+    border: none;
+    box-shadow: 0 3px 6px var(--color-primary-shadow); /* Subtle shadow gives depth so it doesn't look flat/disabled */
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary-custom:hover {
+    background-color: var(--color-primary-hover); /* simple darken on hover */
+    box-shadow: 0 5px 10px var(--color-primary-hover-shadow); /* slightly lifted shadow on hover */
+    color: white;
+}
+
+.btn-primary-custom:disabled {
+    background-color: var(--color-primary-disabled); /* lighter for disabled */
+    color: white;
+    box-shadow: none; /* removes shadow to look flat/disabled */
+    cursor: not-allowed;
+}
+
+.btn-delete-custom {
+    color: var(--color-delete);
+    border: 1px solid var(--color-delete);
+    background-color: transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-delete-custom:hover {
+    background-color: var(--color-delete);
+    box-shadow: 0 4px 8px var(--color-delete-shadow);
+    color: white;
 }

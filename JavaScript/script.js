@@ -477,10 +477,10 @@ const sortEmpDate = () => {
 // Export employee data as CSV file
 const exportToCsv = () => {
   if (employeeData.length !== 0) {
-    const csvData = json2csv.parse(employeeData);
-    csvData.slice(0, 1)
+    const dataToExport = employeeData.map(({ selected, ...rest }) => rest);
+    const csvData = json2csv.parse(dataToExport);
     let blob = new Blob([csvData], { type: "text/csv" });
-    exportBtn.download = "Employee-Data";
+    exportBtn.download = "Employee-Data.csv";
     exportBtn.href = URL.createObjectURL(blob);
     showAcknowledgeToast("Employee Data Downloaded Successfully.");
   } else {
