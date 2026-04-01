@@ -1,14 +1,7 @@
-// ============================================================================
-// EMPLOYEE MANAGEMENT APPLICATION
-// Organized Code Structure following Best Practices
-// ============================================================================
-
-// ============ 1. CONSTANTS ============
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const NAME_REGEX = /^[a-zA-Z][a-zA-Z\s]+$/;
 const SALARY_REGEX = /^[0-9]*$/;
 
-// ============ 2. DOM ELEMENTS - FORM FIELDS ============
 const empName = document.getElementById("fullName");
 const empMail = document.getElementById("email");
 const empDept = document.getElementById("department");
@@ -18,26 +11,21 @@ const empJoinDate = document.getElementById("joiningDate");
 const statusToggle = document.getElementById("statusToggle");
 const statusMsg = document.getElementById("showStatus");
 
-// ============ 3. DOM ELEMENTS - BUTTONS ============
 const submitBtn = document.getElementById("submitBtn");
 const exportBtn = document.getElementById("exportBtn");
 
-// ============ 4. DOM ELEMENTS - CONTAINERS & TABLES ============
 const tableBody = document.getElementById("tableBody");
 const empTable = document.getElementById("empTable");
 const emptyDataMsg = document.querySelector(".emptyDataMsgField");
 
-// ============ 5. DOM ELEMENTS - MODALS ============
 const employeeForm = document.getElementById("employeeForm");
 const empFormFields = document.getElementById("empForm");
 const modalHeading = document.getElementById("employeeModalLabel");
 const deleteConfirmModal = document.getElementById("deleteConfirmationModal");
 
-// ============ 6. DOM ELEMENTS - FILTERS ============
 const interactFields = document.querySelector(".interactFields");
 const statusColToggle = document.querySelectorAll(".statusColToggle");
 
-// ============ 7. STATE / APPLICATION DATA ============
 let employeeData = JSON.parse(localStorage.getItem("EmpData")) || [];
 employeeData = employeeData.map((emp) => ({
   ...emp,
@@ -47,10 +35,6 @@ let currentDisplayData = [];
 let editingIndex = -1;
 let salaryAsc = true;
 let dateAsc = true;
-
-// ============================================================================
-// ============ 8. UTILITY FUNCTIONS ============
-// ============================================================================
 
 // Display toast notification for successful add/edit operations
 const showAcknowledgeToast = (message) => {
@@ -74,10 +58,6 @@ const showWarningToast = (message) => {
   toast.show();
 };
 
-// ============================================================================
-// ============ 9. DISPLAY / RENDERING FUNCTIONS ============
-// ============================================================================
-
 // Render employee table with given data
 const renderEmpTable = (data) => {
   if (data.length === 0) {
@@ -92,15 +72,15 @@ const renderEmpTable = (data) => {
     .map(
       (emp) => `
                           <tr id="empDataRow">
-                            <td class="align-content-center">
+                            <td class="align-content-center px-3">
                               <input type=checkbox name="selectRow" class="selectRow" onclick="return toggleRowSelection('${emp.email}')" ${emp.selected ? "checked" : ""} data-email="${emp.email}">
                             </td>
-                            <td class="align-content-center">${emp.fullName}</td>
-                            <td class="align-content-center">${emp.email}</td>
-                            <td class="align-content-center">${emp.department}</td>
-                            <td class="align-content-center">${emp.role}</td>
-                            <td class="align-content-center">${emp.salary}</td>
-                            <td class="align-content-center">${emp.joiningDate}</td>
+                            <td class="text-start px-3"><img src="../Images/${emp.src}" id="imgPreview" width='35' height='35' alt='profile' class='align-content-center border border-0 rounded-circle me-3 my-2 object-fit-fill'>${emp.fullName}</td>
+                            <td class="align-content-center px-3">${emp.email}</td>
+                            <td class="align-content-center px-3">${emp.department}</td>
+                            <td class="align-content-center px-3">${emp.role}</td>
+                            <td class="align-content-center px-3">${emp.salary}</td>
+                            <td class="align-content-center px-3">${emp.joiningDate}</td>
                             <td class="align-content-center">
                               <div class="form-check form-switch d-flex justify-content-center">
                                 <input onchange="return changeToggleStatus('${emp.email}')"
@@ -108,9 +88,11 @@ const renderEmpTable = (data) => {
                                   <p class="d-none">${emp.status}</p> <!-- Hidden text to show status in csv file -->
                               </div>
                             </td>
-                            <td class="d-flex align-items-center justify-content-center gap-3">
+                            <td class="align-content-center">
+                            <div class="d-flex justify-content-center gap-3">
                               <span class="cursor-pointer py-2" onclick="return editEmployee('${emp.email}')"><img src="../Icons/edit-btn.svg" alt="edit-button" width="18" height="18" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit"></span>
                               <span class="cursor-pointer py-2" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" onclick="return confirmDelete('${emp.email}')"><img src="../Icons/delete-btn.svg" alt="delete-button" width="18" height="18" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete"></span>
+                            </div>
                             </td>
                           </tr>`,
     )
@@ -159,10 +141,10 @@ const toggleRowSelection = (email) => {
 // logic to select or deselect all rows when selectAll checkbox is toggled
 const selectAllRows = (checkBox) => {
   const isChecked = checkBox.querySelector("input").checked;
-  employeeData.forEach((emp) => (emp.selected = isChecked));
+  currentDisplayData.forEach((emp) => (emp.selected = isChecked));
 
   if (isChecked && employeeData.length > 0) {
-    showAcknowledgeToast("All Row(s) selected.");
+    showAcknowledgeToast(`${currentDisplayData.length} Row(s) selected.`);
     document.getElementById("deleteRecords").classList.remove("d-none");
   } else {
     document.getElementById("deleteRecords").classList.add("d-none");
@@ -270,13 +252,25 @@ const updateRequiredIndicators = () => {
   });
 };
 
-// ============================================================================
-// ============ 10. DATA OPERATIONS (CRUD) ============
-// ============================================================================
+// Upload and preview profile picture on table
+const executeUpload = () => {
+  const fileUpload = document.getElementById("fileUpload");
+  const files = fileUpload.files[0];
+  // console.log(files.name);
+
+  if (files) {
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(files);
+  }
+  renderEmpTable(currentDisplayData);
+};
 
 // Add new employee or update existing employee
 const addEmployee = (e) => {
   e.preventDefault();
+  const fileUpload = document.getElementById("fileUpload");
+  const files = fileUpload.files[0];
+  
   const formObj = {
     fullName: empName.value,
     email: empMail.value,
@@ -285,6 +279,7 @@ const addEmployee = (e) => {
     salary: empSalary.value,
     joiningDate: empJoinDate.value,
     status: statusMsg.textContent,
+    src: files ? files?.name : "default-profile.png",
   };
 
   if (editingIndex === -1) {
@@ -303,6 +298,7 @@ const addEmployee = (e) => {
   submitBtn.disabled = true;
   submitBtn.textContent = "Submit";
   filterEmpData();
+  executeUpload();
   empFormFields.reset();
 };
 
@@ -310,6 +306,7 @@ const addEmployee = (e) => {
 const editEmployee = (email) => {
   modalHeading.textContent = "Update Employee";
   const employee = employeeData.find((emp) => emp.email === email);
+  
   editingIndex = employeeData.indexOf(employee);
 
   empName.value = employee.fullName;
@@ -320,6 +317,7 @@ const editEmployee = (email) => {
   empJoinDate.value = employee.joiningDate;
   statusToggle.checked = employee.status === "Active";
   statusMsg.textContent = statusToggle.checked ? "Active" : "Inactive";
+
   updateRequiredIndicators();
 
   submitBtn.disabled = false;
@@ -372,27 +370,22 @@ const changeToggleStatus = (email) => {
   filterEmpData();
 };
 
-// ============================================================================
-// ============ 11. SEARCH & FILTERING ============
-// ============================================================================
-
 // Search employees by name, email, or role
 const searchEmpData = () => {
   const searchBox = document.getElementById("searchBox");
   const searchValue = searchBox?.value?.toLowerCase() || "";
 
-  const filteredData = currentDisplayData.filter((emp) => {
+  const filteredDataSearch = currentDisplayData.filter((emp) => {
     return (
       emp.fullName.toLowerCase().includes(searchValue) ||
       emp.email.toLowerCase().includes(searchValue) ||
       emp.role.toLowerCase().includes(searchValue)
     );
   });
-  if (filteredData.length === 0) {
+  if (filteredDataSearch.length === 0) {
     document.getElementById("emptyMsg").textContent = "No matching Data Found!";
   }
-
-  renderEmpTable(filteredData);
+  renderEmpTable(filteredDataSearch);
 };
 
 // Filter employees by department, status, and salary range
@@ -434,10 +427,6 @@ const filterEmpData = () => {
   }
 };
 
-// ============================================================================
-// ============ 12. SORTING ============
-// ============================================================================
-
 // Sort employees by salary (ascending/descending)
 const sortEmpSalary = () => {
   currentDisplayData.sort((a, b) => {
@@ -470,14 +459,10 @@ const sortEmpDate = () => {
   renderEmpTable(currentDisplayData);
 };
 
-// ============================================================================
-// ============ 13. EXPORT ============
-// ============================================================================
-
 // Export employee data as CSV file
 const exportToCsv = () => {
   if (employeeData.length !== 0) {
-    const dataToExport = employeeData.map(({ selected, ...rest }) => rest);
+    const dataToExport = employeeData.map(({ selected, src, ...rest }) => rest);
     const csvData = json2csv.parse(dataToExport);
     let blob = new Blob([csvData], { type: "text/csv" });
     exportBtn.download = "Employee-Data.csv";
@@ -487,10 +472,6 @@ const exportToCsv = () => {
     showWarningToast("No Employee Data Available!");
   }
 };
-
-// ============================================================================
-// ============ 14. VALIDATION ============
-// ============================================================================
 
 // Validate email format and check for duplicates
 const validateEmail = () => {
@@ -509,12 +490,17 @@ const validateEmail = () => {
 
 // Validate name format (no leading spaces, no numbers)
 const validateName = () => {
-  if (/^\s/.test(empName.value)) {
+  if (/^\s|\d+/.test(empName.value)) {
     empName.classList.add("is-invalid");
     submitBtn.disabled = true;
   } else {
     empName.classList.remove("is-invalid");
   }
+};
+
+// Validate salary (no "dash", "e", "+" allowed)
+const validateSalary = (e) => {
+  if (e.key === "-" || e.key === "e" || e.key === "+") e.preventDefault();
 };
 
 // Validate all form input fields
@@ -539,10 +525,6 @@ const validateFormInput = () => {
 
   updateRequiredIndicators();
 };
-
-// ============================================================================
-// ============ 15. EVENT LISTENERS ============
-// ============================================================================
 
 // Handle status toggle change in form
 statusToggle.addEventListener("change", () => {
@@ -600,10 +582,6 @@ document.getElementById("maxSal").addEventListener("input", () => {
   filterEmpData();
   updateFilterPills();
 });
-
-// ============================================================================
-// ============ 16. INITIALIZATION ============
-// ============================================================================
 
 // Load and display initial data
 currentDisplayData = [...employeeData];

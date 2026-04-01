@@ -1,2 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg fill="#495057" width="800px" height="800px" viewBox="-96 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z"/></svg>
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="30.000000pt" height="30.000000pt" viewBox="0 0 30.000000 30.000000"
+ preserveAspectRatio="xMidYMid meet">
+
+<g transform="translate(0.000000,30.000000) scale(0.100000,-0.100000)"
+fill="#495057" stroke="none">
+<path d="M40 212 c0 -4 25 -32 55 -62 l55 -54 55 54 c30 30 55 58 55 62 0 4
+-49 8 -110 8 -60 0 -110 -4 -110 -8z"/>
+</g>
+</svg>
