@@ -30,6 +30,9 @@ let employeeData = JSON.parse(localStorage.getItem("EmpData")) || [];
 employeeData = employeeData.map((emp) => ({
   ...emp,
   selected: emp.selected || false,
+  // ADDED: Fallback for 'src'. Older local storage data might miss a 'src' property. 
+  // Without this, emp.src.startsWith() throws a runtime crash on initial page load, preventing any data from rendering.
+  src: emp.src || "default-profile.png",
 }));
 let currentDisplayData = [];
 let editingIndex = -1;
@@ -102,7 +105,7 @@ const renderEmpTable = (data) => {
   const tooltipTriggerList = document.querySelectorAll(
     '[data-bs-toggle="tooltip"]',
   );
-  
+
   [...tooltipTriggerList].map((tooltipTriggerEl) => {
     new bootstrap.Tooltip(tooltipTriggerEl);
   });
@@ -429,25 +432,10 @@ const changeToggleStatus = (email) => {
 
 // Search employees by name, email, or role
 const searchEmpData = () => {
-  const searchBox = document.getElementById("searchBox");
-  const searchValue = searchBox?.value?.toLowerCase() || "";
-
-  if (searchValue === "") {
-    renderEmpTable(currentDisplayData);
-    return;
-  }
-
-  const filteredDataSearch = currentDisplayData.filter((emp) => {
-    return (
-      emp.fullName.toLowerCase().includes(searchValue) ||
-      emp.email.toLowerCase().includes(searchValue) ||
-      emp.role.toLowerCase().includes(searchValue)
-    );
-  });
-  if (filteredDataSearch.length === 0) {
-    document.getElementById("emptyMsg").textContent = "No matching Data Found!";
-  }
-  renderEmpTable(filteredDataSearch);
+  // CHANGED: We now route search interactions to the central filterEmpData function.
+  // Previously, search visually updated the table but bypassed the global 'currentDisplayData' variable,
+  // which triggered a bug causing subsequent column sorts to obliterate the search parameters.
+  filterEmpData();
 };
 
 // Filter employees by department, status, and salary range
@@ -459,6 +447,11 @@ const filterEmpData = () => {
   const min = minSalary ? Number(minSalary) : 0;
   const max = maxSalary ? Number(maxSalary) : Infinity;
   const maxSalInput = document.getElementById("maxSal");
+
+  // ADDED: Fetch the search text to evaluate alongside the dropdown filters.
+  // Unifying these constraints guarantees 'currentDisplayData' matches exactly what users see.
+  const searchBox = document.getElementById("searchBox");
+  const searchValue = searchBox?.value?.toLowerCase() || "";
 
   if (max < min) {
     maxSalInput.classList.add("is-invalid");
@@ -474,14 +467,28 @@ const filterEmpData = () => {
       const salaryFilter =
         Number(emp.salary) >= min && Number(emp.salary) <= max;
 
-      return deptFilter && statusFilter && salaryFilter;
+      // ADDED: Moved the core search conditional from 'searchEmpData' to here.
+      // This applies the text search check to every single row alongside your dropdown logic.
+      const searchFilter =
+        searchValue === "" ||
+        emp.fullName.toLowerCase().includes(searchValue) ||
+        emp.email.toLowerCase().includes(searchValue) ||
+        emp.role.toLowerCase().includes(searchValue);
+
+      // ADDED: The searchFilter requirement is enforced before updating 'currentDisplayData' globally.
+      return deptFilter && statusFilter && salaryFilter && searchFilter;
     });
 
     if (filteredData.length === 0) {
       document.getElementById("emptyMsg").textContent =
         "No matching Data Found!";
       document.getElementById("deleteRecords").classList.add("d-none");
-    } 
+    } else {
+      // ADDED: Ensure the default visual state is reset when a search is cleared 
+      // or valid data returns to screen.
+      document.getElementById("emptyMsg").textContent =
+        "No Employee Data Available!";
+    }
 
     currentDisplayData = filteredData;
     renderEmpTable(filteredData);
