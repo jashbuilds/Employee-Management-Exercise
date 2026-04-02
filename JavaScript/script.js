@@ -73,9 +73,9 @@ const renderEmpTable = (data) => {
       (emp) => `
                           <tr id="empDataRow">
                             <td class="align-content-center px-3">
-                              <input type=checkbox name="selectRow" class="selectRow" onclick="return toggleRowSelection('${emp.email}')" ${emp.selected ? "checked" : ""} data-email="${emp.email}">
+                              <input type=checkbox name="selectRow" class="selectRow cursor-pointer" onclick="return toggleRowSelection('${emp.email}')" ${emp.selected ? "checked" : ""} data-email="${emp.email}">
                             </td>
-                            <td class="text-start px-3"><img src="../Images/${emp.src}" id="imgPreview" width='40' height='40' alt='profile' class='align-content-center border border-0 rounded-circle me-3 my-2 object-fit-fill'>${emp.fullName}</td>
+                            <td class="text-start px-3"><img src="${emp.src.startsWith("data:") ? emp.src : "../Images/" + emp.src}" id="imgPreview" width='40' height='40' alt='profile' class='align-content-center border border-0 rounded-circle me-3 my-2 object-fit-fill'>${emp.fullName}</td>
                             <td class="align-content-center px-3">${emp.email}</td>
                             <td class="align-content-center px-3">${emp.department}</td>
                             <td class="align-content-center px-3">${emp.role}</td>
@@ -102,7 +102,8 @@ const renderEmpTable = (data) => {
   const tooltipTriggerList = document.querySelectorAll(
     '[data-bs-toggle="tooltip"]',
   );
-  const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => {
+  
+  [...tooltipTriggerList].map((tooltipTriggerEl) => {
     new bootstrap.Tooltip(tooltipTriggerEl);
   });
 };
@@ -134,7 +135,7 @@ const toggleRowSelection = (email) => {
   }
 
   showAcknowledgeToast(
-    `${totalSelected} of ${employeeData.length} Row(s) selected.`,
+    `${totalSelected} of ${currentDisplayData.length} Row(s) selected.`,
   );
 };
 
@@ -178,10 +179,20 @@ const updateFilterPills = () => {
     const pill = document.createElement("span");
     pill.innerHTML = "";
     pill.className =
-      "badge text-bg-secondary d-flex align-items-center cursor-pointer";
-    pill.innerHTML = `${text} <button type="button" class="btn-close btn-close-white btn-sm ms-2 pillClose" aria-label="Close"></button>`;
+      "btn btn-sm rounded-4 ps-3 pe-2 btn-outline-secondary d-flex align-items-center cursor-pointer gap-1";
+    pill.innerHTML = `${text} <button type="button" class="btn btn-close btn-sm ms-2" aria-label="Close"></button>`;
     pillsContainer.appendChild(pill);
     pill.querySelector("button").onclick = removeFn;
+  };
+
+  const createClearPill = (text, removeFn) => {
+    const pill = document.createElement("span");
+    pill.innerHTML = "";
+    pill.className =
+      "btn btn-sm btn-outline-danger rounded-4 d-flex align-items-center px-3 cursor-pointer";
+    pill.innerHTML = `${text}`;
+    pillsContainer.appendChild(pill);
+    pill.onclick = removeFn;
   };
 
   // Create department pill
@@ -226,7 +237,7 @@ const updateFilterPills = () => {
 
   // Create "Clear All" pill if any filter is active
   if (hasActiveFilters) {
-    createPill("Clear All", () => {
+    createClearPill("Clear All", () => {
       document.getElementById("departmentDropDown").value = "";
       document.getElementById("statusDropDown").value = "";
       document.getElementById("minSal").value = "";
@@ -264,6 +275,8 @@ const executeUpload = () => {
   renderEmpTable(currentDisplayData);
 };
 
+let currentProfileDataUrl = null;
+
 // Preview Selected Profile Picture
 const previewProfilePic = () => {
   const fileUpload = document.getElementById("fileUpload");
@@ -272,6 +285,7 @@ const previewProfilePic = () => {
   if (fileUpload.files && fileUpload.files[0]) {
     const reader = new FileReader();
     reader.onload = (e) => {
+      currentProfileDataUrl = e.target.result;
       profilePreview.src = e.target.result;
       profilePreview.classList.remove("d-none");
     };
@@ -284,6 +298,7 @@ const deleteProfile = () => {
   const profilePreview = document.getElementById("profilePreview");
 
   profilePreview.src = "";
+  currentProfileDataUrl = null;
   document.getElementById("deleteProfilePic").classList.add("d-none");
   document.getElementById("fileUpload").classList.remove("d-none");
   profilePreview.classList.add("d-none");
@@ -292,8 +307,6 @@ const deleteProfile = () => {
 // Add new employee or update existing employee
 const addEmployee = (e) => {
   e.preventDefault();
-  const fileUpload = document.getElementById("fileUpload");
-  const files = fileUpload.files[0];
 
   const formObj = {
     fullName: empName.value,
@@ -303,10 +316,8 @@ const addEmployee = (e) => {
     salary: empSalary.value,
     joiningDate: empJoinDate.value,
     status: statusMsg.textContent,
-    src: files ? files?.name : "default-profile.png",
+    src: currentProfileDataUrl || "default-profile.png",
   };
-  console.log(formObj.src);
-  
 
   if (editingIndex === -1) {
     // Adding new employee
@@ -326,6 +337,7 @@ const addEmployee = (e) => {
   filterEmpData();
   executeUpload();
   empFormFields.reset();
+  currentProfileDataUrl = null;
 };
 
 // Populate form for editing an employee
@@ -346,7 +358,13 @@ const editEmployee = (email) => {
 
   const profilePreview = document.getElementById("profilePreview");
   if (employee.src && employee.src !== "default-profile.png") {
-    profilePreview.src = `../Images/${employee.src}`;
+    if (employee.src.startsWith("data")) {
+      profilePreview.src = employee.src;
+      currentProfileDataUrl = employee.src;
+    } else {
+      profilePreview.src = `../Images/${employee.src}`;
+      currentProfileDataUrl = null;
+    }
 
     document.getElementById("deleteProfilePic").classList.remove("d-none");
     document.getElementById("fileUpload").classList.add("d-none");
@@ -462,7 +480,8 @@ const filterEmpData = () => {
     if (filteredData.length === 0) {
       document.getElementById("emptyMsg").textContent =
         "No matching Data Found!";
-    }
+      document.getElementById("deleteRecords").classList.add("d-none");
+    } 
 
     currentDisplayData = filteredData;
     renderEmpTable(filteredData);

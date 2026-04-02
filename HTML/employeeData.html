@@ -14,7 +14,6 @@
         <link
             href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
             rel="stylesheet">
-        <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net"> -->
         <link rel="stylesheet" href="../CSS/style.css">
         <link rel="shortcut icon" href="../Images/employee-icon.png"
             type="image/x-icon">
@@ -34,7 +33,7 @@
             </div>
         </nav>
 
-        <div class="my-4 d-flex align-items-center gap-4">
+        <div class="my-4 d-flex align-items-center gap-sm-4 gap-3">
             <!-- Export Button -->
             <a
                 class="exportBtn cursor-pointer ms-auto py-2 px-3 rounded-3 text-dark-emphasis fw-medium text-decoration-none d-flex gap-2 align-items-center justify-content-center"
@@ -52,7 +51,7 @@
         </div>
 
         <main
-            class="mainContent border border-start-1 rounded-4 mt-4 mx-4 mb-5 shadow bg-light">
+            class="mainContent position-relative border border-start-1 rounded-4 mt-4 mx-4 mb-5 shadow bg-light">
 
             <!-- Search & Filter Fields -->
             <div
@@ -72,13 +71,7 @@
                             placeholder="Search by name, email, role..."
                             oninput="return searchEmpData()">
                     </div>
-                    <div class="position-absolute top-100 start-75">
-                        <button
-                            class="btn btn-delete-custom d-flex my-3 ms-auto d-none"
-                            data-bs-toggle="modal"
-                            data-bs-target="#deleteSelectedConfirmation"
-                            id="deleteRecords">Delete</button>
-                    </div>
+
                 </div>
 
                 <!-- Department, Status, Salary Filters -->
@@ -142,14 +135,25 @@
                             > Min!</div>
                     </div>
                 </div>
-                <!-- Filter pills container -->
-                <div
-                    class="d-flex flex-wrap gap-3 justify-content-end position-absolute top-130"
-                    id="filterPills"></div>
+
+            </div>
+
+            <!-- Filter pills container -->
+            <div
+                class="d-flex flex-wrap gap-3 w-50 align-items-center justify-content-start mx-3"
+                id="filterPills"></div>
+
+            <!-- Selected records delete button -->
+            <div class="position-absolute top-25 end-0">
+                <button
+                    class="btn btn-delete-custom d-flex ms-auto mx-3 d-none"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteSelectedConfirmation"
+                    id="deleteRecords">Delete</button>
             </div>
 
             <!-- Employee Data Table -->
-            <div class="mx-3 my-5 pt-4 text-nowrap" id="empTable">
+            <div class="mx-3 mb-5 mt-2 pt-5 text-nowrap" id="empTable">
                 <div class="table-responsive-xxl shadow-sm">
                     <table class="table table-hover text-start fs-6 mb-0">
                         <thead class="table-success border-bottom-0">
@@ -158,7 +162,7 @@
                                     onchange="return selectAllRows(this)"
                                     class="px-3">
                                     <input type="checkbox" name="selectAllRows"
-                                        class="selectAllRows">
+                                        class="selectAllRows cursor-pointer">
                                 </th>
                                 <th scope="col"
                                     class="text-dark-emphasis px-3">Name</th>
@@ -344,7 +348,7 @@
                                                 <img id="profilePreview" src
                                                     alt="Profile Preview"
                                                     class="img-thumbnail d-none border border-0 rounded-circle"
-                                                    width="50" height="50">
+                                                    width="50" height="40">
                                                 <img
                                                     src="../Icons/delete-btn.svg"
                                                     class="d-none cursor-pointer"
@@ -499,12 +503,6 @@
         <script src="https://cdn.jsdelivr.net/npm/json2csv"></script>
         <script src="../JavaScript/script.js"></script>
 
-        <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl, {
-            trigger: 'hover'
-        }));
-    </script>
     </body>
 
 </html>
