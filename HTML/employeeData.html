@@ -144,13 +144,13 @@
                 </div>
                 <!-- Filter pills container -->
                 <div
-                    class="d-flex flex-wrap gap-3 justify-content-end position-absolute top-100"
+                    class="d-flex flex-wrap gap-3 justify-content-end position-absolute top-130"
                     id="filterPills"></div>
             </div>
 
             <!-- Employee Data Table -->
             <div class="mx-3 my-5 pt-4 text-nowrap" id="empTable">
-                <div class="table-responsive-xxl shadow">
+                <div class="table-responsive-xxl shadow-sm">
                     <table class="table table-hover text-start fs-6 mb-0">
                         <thead class="table-success border-bottom-0">
                             <tr class="fw-semibold border">
@@ -161,34 +161,41 @@
                                         class="selectAllRows">
                                 </th>
                                 <th scope="col"
-                                    class="text-light-emphasis px-3">Name</th>
+                                    class="text-dark-emphasis px-3">Name</th>
                                 <th scope="col"
-                                    class="text-light-emphasis px-3">Email</th>
+                                    class="text-dark-emphasis px-3">Email</th>
                                 <th scope="col"
-                                    class="text-light-emphasis px-3">Department</th>
+                                    class="text-dark-emphasis px-3">Department</th>
                                 <th scope="col"
-                                    class="text-light-emphasis px-3">Role</th>
+                                    class="text-dark-emphasis px-3">Role</th>
                                 <th scope="col"
-                                    class="cursor-pointer text-light-emphasis px-3"
-                                    onclick="sortEmpSalary()">Salary
-                                    &nbsp;<img src="../Icons/sort-arrow.svg"
-                                        class="align-items-center"
-                                        alt="sort-arrow"
-                                        width="16" height="16"
-                                        id="sortBySalary"></th>
+                                    class="cursor-pointer text-dark-emphasis px-3"
+                                    onclick="sortEmpSalary()"><div
+                                        class="d-flex gap-2 align-items-center">
+                                        Salary&nbsp;<img
+                                            src="../Icons/sort-arrow.svg"
+                                            class="align-items-center"
+                                            alt="sort-arrow"
+                                            width="16" height="16"
+                                            id="sortBySalary">
+                                    </div>
+                                </th>
                                 <th scope="col"
-                                    class="cursor-pointer text-light-emphasis px-3"
-                                    onclick="sortEmpDate()">Joining
-                                    Date
-                                    &nbsp;<img src="../Icons/sort-arrow.svg"
-                                        class="align-items-center"
-                                        alt="sort-arrow"
-                                        width="16" height="16"
-                                        id="sortByDate"></th>
+                                    class="cursor-pointer text-dark-emphasis px-3"
+                                    onclick="sortEmpDate()"><div
+                                        class="d-flex gap-2 align-items-center">
+                                        Joining Date&nbsp;<img
+                                            src="../Icons/sort-arrow.svg"
+                                            class="align-items-center"
+                                            alt="sort-arrow"
+                                            width="16" height="16"
+                                            id="sortByDate">
+                                    </div>
+                                </th>
                                 <th scope="col"
-                                    class="text-light-emphasis text-center px-3">Status</th>
+                                    class="text-dark-emphasis text-center px-3">Status</th>
                                 <th scope="col"
-                                    class="text-light-emphasis text-center px-3">Actions</th>
+                                    class="text-dark-emphasis text-center px-3">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
@@ -206,7 +213,8 @@
             </div>
 
             <!-- Add/Edit Form Modal -->
-            <div class="modal fade" id="employeeForm" tabindex="-1"
+            <div class="modal fade employeeModal" id="employeeForm"
+                tabindex="-1"
                 aria-labelledby="formModalLabel" aria-hidden="true"
                 data-bs-backdrop="static" data-bs-keyboard="false">
                 <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -231,7 +239,9 @@
                                                     oninput="validateFormInput(); validateName()"
                                                     required>
                                                 <div
-                                                    class="invalid-feedback">Please enter a valid Name or Remove Digits!
+                                                    class="invalid-feedback">Please
+                                                    enter a valid Name or Remove
+                                                    Digits!
                                                 </div>
                                             </div>
                                         </div>
@@ -318,18 +328,35 @@
                                                     required>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-4">
-                                                <label
-                                                    for="profileInput">Profile
-                                                    Picture</label>
-                                                <div class="input-group mb-3">
-                                                    <input type="file"
-                                                        class="form-control"
-                                                        id="fileUpload"
-                                                        accept="image/*">
-                                                </div>
+                                        <div class="col-md-6 mb-4">
+                                            <label
+                                                for="profileInput">Profile
+                                                Picture</label>
+                                            <div class="input-group">
+                                                <input type="file"
+                                                    class="form-control"
+                                                    id="fileUpload"
+                                                    accept="image/*"
+                                                    onchange="previewProfilePic()">
                                             </div>
+                                            <div id="profilePreviewContainer"
+                                                class="d-flex gap-3 justify-content-start align-items-center">
+                                                <img id="profilePreview" src
+                                                    alt="Profile Preview"
+                                                    class="img-thumbnail d-none border border-0 rounded-circle"
+                                                    width="50" height="50">
+                                                <img
+                                                    src="../Icons/delete-btn.svg"
+                                                    class="d-none cursor-pointer"
+                                                    alt="delete-button"
+                                                    id="deleteProfilePic"
+                                                    width="18" height="18"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="bottom"
+                                                    data-bs-title="Delete Profile"
+                                                    onclick="deleteProfile()">
+                                            </div>
+
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-2">
@@ -373,7 +400,8 @@
             </div>
 
             <!-- Delete Confirmation Modal -->
-            <div class="modal fade" id="deleteConfirmationModal" tabindex="-1"
+            <div class="modal fade employeeModal" id="deleteConfirmationModal"
+                tabindex="-1"
                 aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog">

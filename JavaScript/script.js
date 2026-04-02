@@ -75,7 +75,7 @@ const renderEmpTable = (data) => {
                             <td class="align-content-center px-3">
                               <input type=checkbox name="selectRow" class="selectRow" onclick="return toggleRowSelection('${emp.email}')" ${emp.selected ? "checked" : ""} data-email="${emp.email}">
                             </td>
-                            <td class="text-start px-3"><img src="../Images/${emp.src}" id="imgPreview" width='35' height='35' alt='profile' class='align-content-center border border-0 rounded-circle me-3 my-2 object-fit-fill'>${emp.fullName}</td>
+                            <td class="text-start px-3"><img src="../Images/${emp.src}" id="imgPreview" width='40' height='40' alt='profile' class='align-content-center border border-0 rounded-circle me-3 my-2 object-fit-fill'>${emp.fullName}</td>
                             <td class="align-content-center px-3">${emp.email}</td>
                             <td class="align-content-center px-3">${emp.department}</td>
                             <td class="align-content-center px-3">${emp.role}</td>
@@ -256,7 +256,6 @@ const updateRequiredIndicators = () => {
 const executeUpload = () => {
   const fileUpload = document.getElementById("fileUpload");
   const files = fileUpload.files[0];
-  // console.log(files.name);
 
   if (files) {
     const fileReader = new FileReader();
@@ -265,12 +264,37 @@ const executeUpload = () => {
   renderEmpTable(currentDisplayData);
 };
 
+// Preview Selected Profile Picture
+const previewProfilePic = () => {
+  const fileUpload = document.getElementById("fileUpload");
+  const profilePreview = document.getElementById("profilePreview");
+
+  if (fileUpload.files && fileUpload.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      profilePreview.src = e.target.result;
+      profilePreview.classList.remove("d-none");
+    };
+    reader.readAsDataURL(fileUpload.files[0]);
+  }
+};
+
+// Delete Profile Picture
+const deleteProfile = () => {
+  const profilePreview = document.getElementById("profilePreview");
+
+  profilePreview.src = "";
+  document.getElementById("deleteProfilePic").classList.add("d-none");
+  document.getElementById("fileUpload").classList.remove("d-none");
+  profilePreview.classList.add("d-none");
+};
+
 // Add new employee or update existing employee
 const addEmployee = (e) => {
   e.preventDefault();
   const fileUpload = document.getElementById("fileUpload");
   const files = fileUpload.files[0];
-  
+
   const formObj = {
     fullName: empName.value,
     email: empMail.value,
@@ -281,6 +305,8 @@ const addEmployee = (e) => {
     status: statusMsg.textContent,
     src: files ? files?.name : "default-profile.png",
   };
+  console.log(formObj.src);
+  
 
   if (editingIndex === -1) {
     // Adding new employee
@@ -306,7 +332,7 @@ const addEmployee = (e) => {
 const editEmployee = (email) => {
   modalHeading.textContent = "Update Employee";
   const employee = employeeData.find((emp) => emp.email === email);
-  
+
   editingIndex = employeeData.indexOf(employee);
 
   empName.value = employee.fullName;
@@ -317,6 +343,19 @@ const editEmployee = (email) => {
   empJoinDate.value = employee.joiningDate;
   statusToggle.checked = employee.status === "Active";
   statusMsg.textContent = statusToggle.checked ? "Active" : "Inactive";
+
+  const profilePreview = document.getElementById("profilePreview");
+  if (employee.src && employee.src !== "default-profile.png") {
+    profilePreview.src = `../Images/${employee.src}`;
+
+    document.getElementById("deleteProfilePic").classList.remove("d-none");
+    document.getElementById("fileUpload").classList.add("d-none");
+    profilePreview.classList.remove("d-none");
+  } else {
+    document.getElementById("deleteProfilePic").classList.add("d-none");
+    document.getElementById("fileUpload").classList.remove("d-none");
+    profilePreview.classList.add("d-none");
+  }
 
   updateRequiredIndicators();
 
@@ -375,6 +414,11 @@ const searchEmpData = () => {
   const searchBox = document.getElementById("searchBox");
   const searchValue = searchBox?.value?.toLowerCase() || "";
 
+  if (searchValue === "") {
+    renderEmpTable(currentDisplayData);
+    return;
+  }
+
   const filteredDataSearch = currentDisplayData.filter((emp) => {
     return (
       emp.fullName.toLowerCase().includes(searchValue) ||
@@ -429,7 +473,8 @@ const filterEmpData = () => {
 
 // Sort employees by salary (ascending/descending)
 const sortEmpSalary = () => {
-  currentDisplayData.sort((a, b) => {
+  const dataToSort = [...currentDisplayData];
+  dataToSort.sort((a, b) => {
     if (salaryAsc) {
       document.getElementById("sortBySalary").src = "../Icons/sort-down.svg";
       return Number(a.salary) - Number(b.salary);
@@ -440,12 +485,13 @@ const sortEmpSalary = () => {
   });
   salaryAsc = !salaryAsc;
 
-  renderEmpTable(currentDisplayData);
+  renderEmpTable(dataToSort);
 };
 
 // Sort employees by joining date (ascending/descending)
 const sortEmpDate = () => {
-  currentDisplayData.sort((a, b) => {
+  const dataToSort = [...currentDisplayData];
+  dataToSort.sort((a, b) => {
     if (dateAsc) {
       document.getElementById("sortByDate").src = "../Icons/sort-down.svg";
       return new Date(a.joiningDate) - new Date(b.joiningDate);
@@ -456,7 +502,7 @@ const sortEmpDate = () => {
   });
   dateAsc = !dateAsc;
 
-  renderEmpTable(currentDisplayData);
+  renderEmpTable(dataToSort);
 };
 
 // Export employee data as CSV file
@@ -547,6 +593,10 @@ employeeForm.addEventListener("hidden.bs.modal", () => {
   submitBtn.disabled = true;
   empFormFields.reset();
   empMail.classList.remove("is-invalid");
+
+  const profilePreview = document.getElementById("profilePreview");
+  profilePreview.classList.add("d-none");
+
   document.querySelectorAll(".form-label.field-filled").forEach((label) => {
     label.classList.remove("field-filled");
   });
@@ -557,6 +607,10 @@ employeeForm.addEventListener("hidden.bs.modal", () => {
     statusToggle.classList.remove("bg-light-green");
     statusMsg.value = "Inactive";
   }
+
+  document.getElementById("deleteProfilePic").classList.add("d-none");
+  document.getElementById("fileUpload").classList.remove("d-none");
+  profilePreview.classList.add("d-none");
 });
 
 // Handle department filter change
