@@ -30,12 +30,11 @@ let employeeData = JSON.parse(localStorage.getItem("EmpData")) || [];
 employeeData = employeeData.map((emp) => ({
   ...emp,
   selected: emp.selected || false,
-  // ADDED: Fallback for 'src'. Older local storage data might miss a 'src' property. 
-  // Without this, emp.src.startsWith() throws a runtime crash on initial page load, preventing any data from rendering.
   src: emp.src || "default-profile.png",
 }));
 let currentDisplayData = [];
 let editingIndex = -1;
+let nameAsc = true;
 let salaryAsc = true;
 let dateAsc = true;
 
@@ -78,12 +77,18 @@ const renderEmpTable = (data) => {
                             <td class="align-content-center px-3">
                               <input type=checkbox name="selectRow" class="selectRow cursor-pointer" onclick="return toggleRowSelection('${emp.email}')" ${emp.selected ? "checked" : ""} data-email="${emp.email}">
                             </td>
-                            <td class="text-start px-3"><img src="${emp.src.startsWith("data:") ? emp.src : "../Images/" + emp.src}" id="imgPreview" width='40' height='40' alt='profile' class='align-content-center border border-0 rounded-circle me-3 my-2 object-fit-fill'>${emp.fullName}</td>
-                            <td class="align-content-center px-3">${emp.email}</td>
-                            <td class="align-content-center px-3">${emp.department}</td>
-                            <td class="align-content-center px-3">${emp.role}</td>
-                            <td class="align-content-center px-3">${emp.salary}</td>
-                            <td class="align-content-center px-3">${emp.joiningDate}</td>
+                            <td class="text-start px-3 text-secondary-emphasis">
+                              <div class="d-flex align-items-center">
+                                <img src="${emp.src.startsWith("data:") ? emp.src : "../Images/" + emp.src}" id="imgPreview" width='40' height='40' alt='profile' class='align-content-center border border-0 rounded-circle me-3 my-2 object-fit-fill'><span class="text-ellipsis w-50 overflow-hidden cursor-default" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${emp.fullName}">${emp.fullName}</span>
+                              </div>
+                            </td>
+                            <td class="align-content-center px-3 text-secondary-emphasis">
+                                <span class="d-inline-block text-ellipsis w-75 overflow-hidden cursor-default" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${emp.email}">${emp.email}</span>
+                            </td>
+                            <td class="align-content-center px-3 text-secondary-emphasis">${emp.department}</td>
+                            <td class="align-content-center px-3 text-secondary-emphasis">${emp.role}</td>
+                            <td class="align-content-center px-3 text-secondary-emphasis">$ ${emp.salary}</td>
+                            <td class="align-content-center px-3 text-secondary-emphasis">${emp.joiningDate}</td>
                             <td class="align-content-center">
                               <div class="form-check form-switch d-flex justify-content-center">
                                 <input onchange="return changeToggleStatus('${emp.email}')"
@@ -127,14 +132,6 @@ const toggleRowSelection = (email) => {
     document.getElementById("deleteRecords").classList.remove("d-none");
   } else {
     document.getElementById("deleteRecords").classList.add("d-none");
-  }
-
-  if (selectAllCheckBox.checked) {
-    selectAllCheckBox.indeterminate = false;
-  } else if (totalSelected > 0 && totalSelected < employeeData.length) {
-    selectAllCheckBox.indeterminate = true;
-  } else {
-    selectAllCheckBox.indeterminate = false;
   }
 
   showAcknowledgeToast(
@@ -325,12 +322,14 @@ const addEmployee = (e) => {
   if (editingIndex === -1) {
     // Adding new employee
     employeeData.push(formObj);
-    showAcknowledgeToast("Employee Added Successfully.");
+    showAcknowledgeToast(`Employee '${formObj.fullName}' Added Successfully.`);
   } else {
     // Updating existing employee
     employeeData[editingIndex] = formObj;
     editingIndex = -1;
-    showAcknowledgeToast("Employee Updated Successfully.");
+    showAcknowledgeToast(
+      `Employee '${formObj.fullName}' Updated Successfully.`,
+    );
   }
 
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
@@ -401,7 +400,7 @@ const deleteEmployee = (email) => {
   employeeData.splice(position, 1);
 
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
-  showWarningToast("Employee Deleted!");
+  showWarningToast(`Employee ${employee.fullName} Deleted!`);
   filterEmpData();
 
   if (employeeData.length === 0) {
@@ -425,16 +424,12 @@ const changeToggleStatus = (email) => {
   employeeMail.status =
     employeeMail.status === "Active" ? "Inactive" : "Active";
 
+  showAcknowledgeToast(
+    `Status of '${employeeMail.fullName}' changed to ${employeeMail.status}.`,
+  );
+
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
 
-  filterEmpData();
-};
-
-// Search employees by name, email, or role
-const searchEmpData = () => {
-  // CHANGED: We now route search interactions to the central filterEmpData function.
-  // Previously, search visually updated the table but bypassed the global 'currentDisplayData' variable,
-  // which triggered a bug causing subsequent column sorts to obliterate the search parameters.
   filterEmpData();
 };
 
@@ -448,8 +443,6 @@ const filterEmpData = () => {
   const max = maxSalary ? Number(maxSalary) : Infinity;
   const maxSalInput = document.getElementById("maxSal");
 
-  // ADDED: Fetch the search text to evaluate alongside the dropdown filters.
-  // Unifying these constraints guarantees 'currentDisplayData' matches exactly what users see.
   const searchBox = document.getElementById("searchBox");
   const searchValue = searchBox?.value?.toLowerCase() || "";
 
@@ -467,15 +460,12 @@ const filterEmpData = () => {
       const salaryFilter =
         Number(emp.salary) >= min && Number(emp.salary) <= max;
 
-      // ADDED: Moved the core search conditional from 'searchEmpData' to here.
-      // This applies the text search check to every single row alongside your dropdown logic.
       const searchFilter =
         searchValue === "" ||
         emp.fullName.toLowerCase().includes(searchValue) ||
         emp.email.toLowerCase().includes(searchValue) ||
         emp.role.toLowerCase().includes(searchValue);
 
-      // ADDED: The searchFilter requirement is enforced before updating 'currentDisplayData' globally.
       return deptFilter && statusFilter && salaryFilter && searchFilter;
     });
 
@@ -484,8 +474,6 @@ const filterEmpData = () => {
         "No matching Data Found!";
       document.getElementById("deleteRecords").classList.add("d-none");
     } else {
-      // ADDED: Ensure the default visual state is reset when a search is cleared 
-      // or valid data returns to screen.
       document.getElementById("emptyMsg").textContent =
         "No Employee Data Available!";
     }
@@ -497,10 +485,30 @@ const filterEmpData = () => {
   }
 };
 
+// Sort employees by name (ascending/descending)
+const sortEmpName = () => {
+  const dataToSort = [...currentDisplayData];
+  dataToSort.sort((a, b) => {
+    
+    if (nameAsc) {
+      document.getElementById("sortByName").src = "../Icons/sort-down.svg"
+      return a.fullName.localeCompare(b.fullName);
+    } else {
+      document.getElementById("sortByName").src = "../Icons/sort-up.svg"
+      return b.fullName.localeCompare(a.fullName);
+    } 
+  });
+  nameAsc = !nameAsc;
+
+  renderEmpTable(dataToSort)
+};
+
+
 // Sort employees by salary (ascending/descending)
 const sortEmpSalary = () => {
   const dataToSort = [...currentDisplayData];
   dataToSort.sort((a, b) => {
+
     if (salaryAsc) {
       document.getElementById("sortBySalary").src = "../Icons/sort-down.svg";
       return Number(a.salary) - Number(b.salary);
@@ -518,6 +526,7 @@ const sortEmpSalary = () => {
 const sortEmpDate = () => {
   const dataToSort = [...currentDisplayData];
   dataToSort.sort((a, b) => {
+
     if (dateAsc) {
       document.getElementById("sortByDate").src = "../Icons/sort-down.svg";
       return new Date(a.joiningDate) - new Date(b.joiningDate);
@@ -666,3 +675,8 @@ document.getElementById("maxSal").addEventListener("input", () => {
 // Load and display initial data
 currentDisplayData = [...employeeData];
 renderEmpTable(employeeData);
+
+// Welcome Toast
+window.onload = () => {
+  showAcknowledgeToast("Welcome to Employee Management System!");
+};

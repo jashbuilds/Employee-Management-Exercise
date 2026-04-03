@@ -120,6 +120,10 @@ select:required:invalid {
     cursor: pointer;
 }
 
+.cursor-default {
+    cursor: default;
+}
+
 .bg-light-green {
     background-color: var(--color-primary) !important;
     border-color: var(--color-primary) !important;
@@ -128,4 +132,17 @@ select:required:invalid {
 .bg-light-green:hover {
     background-color: var(--color-primary-hover) !important;
     border-color: var(--color-primary-hover) !important;
+}
+
+.fs-7 {
+    font-size: 15px;
+}
+
+.mh-500 {
+    max-height: 500px !important;
+}
+
+.text-ellipsis {
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
