@@ -46,7 +46,8 @@
                 class="btn btn-primary-custom me-4 fw-medium rounded-3 d-flex justify-content-center align-items-center gap-2 py-2 px-3 fs-6"
                 data-bs-toggle="modal" data-bs-target="#employeeForm"
                 type="submit"><img src="../Icons/add-icon.svg"
-                    alt="add-employee-icon" width="18" height="18">Add Employee</button>
+                    alt="add-employee-icon" width="18" height="18">Add
+                Employee</button>
         </div>
 
         <main
@@ -54,12 +55,12 @@
 
             <!-- Search & Filter Fields -->
             <div
-                class="row position-relative g-3 align-items-center mb-5 mx-1 mx-md-2 mt-2 interactFields">
+                class="row position-relative g-3 align-items-center mb-3 mx-1 mx-md-2 mt-2 interactFields">
 
                 <!-- Search Input -->
                 <div class="col-12 col-xl-4 order-last order-xl-first">
                     <div
-                        class="input-group overflow-hidden rounded-3 mt-4 mt-xl-0">
+                        class="input-group overflow-hidden rounded-3 mt-0 mt-xl-4">
                         <span
                             class="input-group-text bg-body-secondary rounded-start-3">
                             <img src="../Icons/search.svg" class="img-fluid"
@@ -123,11 +124,13 @@
                             onKeyPress="if(this.value.length==8) return false;"
                             class="form-control border-start-0 px-1 px-md-2 bg-light"
                             placeholder="Min"
+                            onkeydown="return validateNumberInput(event)"
                             oninput="return filterEmpData()">
                         <input type="number" id="maxSal" min="0"
                             onKeyPress="if(this.value.length==8) return false;"
                             class="form-control px-1 px-md-2 bg-light rounded-end-3"
                             placeholder="Max"
+                            onkeydown="return validateNumberInput(event)"
                             oninput="return filterEmpData()">
                         <div
                             class="invalid-feedback position-absolute top-100 end-0">Max
@@ -139,45 +142,42 @@
 
             <!-- Filter pills container -->
             <div
-                class="d-flex flex-wrap gap-3 w-50 align-items-center justify-content-start mx-3"
+                class="d-flex flex-wrap gap-3 w-75 align-items-center justify-content-start mx-3"
                 id="filterPills"></div>
 
-            <!-- Selected records delete button -->
-            <div class="position-absolute top-25 end-0">
-                <button
-                    class="btn btn-delete-custom d-flex ms-auto mx-3 d-none"
-                    data-bs-toggle="modal"
-                    data-bs-target="#deleteSelectedConfirmation"
-                    id="deleteRecords">Delete</button>
-            </div>
-
             <!-- Employee Data Table -->
-            <div class="mx-3 mb-5 mt-2 pt-5 text-nowrap" id="empTable">
-                <div class="table-responsive-xxl mh-500 shadow-sm overflow-y-scroll">
-                    <table class="table table-hover text-start fs-6 mb-0 position-relative">
+            <div class="position-relative mx-3 mb-5 text-nowrap" id="empTable">
+                <div
+                    class="table-responsive-xxl mh-500 shadow-sm overflow-y-scroll mt-5">
+                    <table
+                        class="table table-hover text-start fs-6 mb-0 position-relative">
                         <thead class="table-success">
                             <tr class="fw-semibold position-sticky top-0">
                                 <th scope="col"
                                     onchange="return selectAllRows(this)"
-                                    class="px-3">
+                                    class="px-sm-3 px-2 tableHead">
                                     <input type="checkbox" name="selectAllRows"
                                         class="selectAllRows cursor-pointer">
                                 </th>
                                 <th scope="col"
-                                    class="text-dark-emphasis px-3 cursor-pointer" onclick="sortEmpName()">
-                                    <div class="d-flex gap-2 align-items-center">
-                                        Name <img src="../Icons/sort-arrow.svg" alt="sort-arrow" width="16" height="16" id="sortByName">
+                                    class="text-dark-emphasis px-sm-3 ps-1 pe-2 cursor-pointer tableHead"
+                                    onclick="sortEmpName()">
+                                    <div
+                                        class="d-flex gap-1 gap-sm-2 align-items-center">
+                                        Name <img src="../Icons/sort-arrow.svg"
+                                            alt="sort-arrow" width="16"
+                                            height="16" id="sortByName">
                                     </div></th>
                                 <th scope="col"
-                                    class="text-dark-emphasis px-3">Email</th>
+                                    class="text-dark-emphasis px-sm-3 ps-1 pe-2 tableHead">Email</th>
                                 <th scope="col"
-                                    class="text-dark-emphasis px-3">Department</th>
+                                    class="text-dark-emphasis px-sm-3 ps-1 pe-2 tableHead">Department</th>
                                 <th scope="col"
-                                    class="text-dark-emphasis px-3">Job Title</th>
+                                    class="text-dark-emphasis px-sm-3 ps-1 pe-2 tableHead">Role</th>
                                 <th scope="col"
-                                    class="cursor-pointer text-dark-emphasis px-3"
+                                    class="cursor-pointer text-dark-emphasis px-sm-3 ps-1 pe-2 tableHead"
                                     onclick="sortEmpSalary()"><div
-                                        class="d-flex gap-2 align-items-center">
+                                        class="d-flex gap-1 gap-sm-2 align-items-center">
                                         Salary<img
                                             src="../Icons/sort-arrow.svg"
                                             class="align-items-center"
@@ -187,9 +187,9 @@
                                     </div>
                                 </th>
                                 <th scope="col"
-                                    class="cursor-pointer text-dark-emphasis px-3"
+                                    class="cursor-pointer text-dark-emphasis px-sm-3 ps-1 pe-2 tableHead"
                                     onclick="sortEmpDate()"><div
-                                        class="d-flex gap-2 align-items-center">
+                                        class="d-flex gap-1 gap-sm-2 align-items-center">
                                         Joining Date&nbsp;<img
                                             src="../Icons/sort-arrow.svg"
                                             class="align-items-center"
@@ -199,9 +199,9 @@
                                     </div>
                                 </th>
                                 <th scope="col"
-                                    class="text-dark-emphasis text-center px-3">Status</th>
+                                    class="text-dark-emphasis text-center px-sm-3 ps-1 pe-2 tableHead">Status</th>
                                 <th scope="col"
-                                    class="text-dark-emphasis text-center px-3">Actions</th>
+                                    class="text-dark-emphasis text-center px-sm-3 ps-1 pe-2 tableHead">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
@@ -209,6 +209,16 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Selected records delete button -->
+                <div class="position-absolute top-11 end-0" id="deleteSelectedRow">
+                    <button
+                        class="btn btn-delete-custom d-flex ms-auto d-none"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteSelectedConfirmation"
+                        id="deleteRecords">Delete</button>
+                </div>
+
                 <div
                     class="emptyDataMsgField d-flex align-items-center justify-content-center border border-0  bg-body-secondary gap-2">
                     <img src="../Icons/exclamation-circle.svg"
@@ -216,6 +226,7 @@
                     <p class="m-0 text-body-tertiary" id="emptyMsg">No
                         Employee Data Available!</p>
                 </div>
+
             </div>
 
             <!-- Add/Edit Form Modal -->
@@ -312,7 +323,7 @@
                                                         class="form-control"
                                                         id="salary"
                                                         placeholder="Enter salary"
-                                                        onkeydown="return validateSalary(event)"
+                                                        onkeydown="return validateNumberInput(event)"
                                                         oninput="validateFormInput();"
                                                         onKeyPress="if(this.value.length==8) return false;"
                                                         min="0"
@@ -325,17 +336,20 @@
                                         <div class="col-md-6">
                                             <div class="mb-4">
                                                 <label for="joiningDate"
-                                                    class="form-label fs-7">Joining Date</label>
+                                                    class="form-label fs-7">Joining
+                                                    Date</label>
                                                 <input type="date"
                                                     class="form-control"
                                                     id="joiningDate"
                                                     oninput="validateFormInput()"
+                                                    max
                                                     required>
                                             </div>
                                         </div>
                                         <div class="col-md-6 mb-4">
                                             <label
-                                                for="profileInput fs-7">Profile Picture</label>
+                                                for="profileInput fs-7">Profile
+                                                Picture</label>
                                             <div class="input-group">
                                                 <input type="file"
                                                     class="form-control"
@@ -347,7 +361,7 @@
                                                 class="d-flex gap-3 justify-content-start align-items-center">
                                                 <img id="profilePreview" src
                                                     alt="Profile Preview"
-                                                    class="img-thumbnail d-none border border-0 rounded-circle"
+                                                    class="img-thumbnail d-none border border-0 rounded-circle object-fit-contain"
                                                     width="50" height="40">
                                                 <img
                                                     src="../Icons/delete-btn.svg"
@@ -391,7 +405,7 @@
                                         data-bs-dismiss="modal">Close</button>
                                     <button type="submit"
                                         data-bs-dismiss="modal"
-                                        onclick="addEmployee(event)"
+                                        onclick="addOrUpdateEmployee(event)"
                                         class="btn btn-primary-custom"
                                         id="submitBtn"
                                         disabled>Submit</button>
@@ -457,10 +471,10 @@
                 </div>
             </div>
 
-            <!-- Add/Edit Toast Message -->
+            <!-- Toast Message -->
             <div class="position-fixed bottom-0 end-0 p-3">
                 <div id="notificationToast"
-                    class="toast text-bg-success border-0 w-100" role="alert"
+                    class="toast border-0 w-100" role="alert"
                     aria-live="assertive"
                     aria-atomic="true">
                     <div class="d-flex">
@@ -476,24 +490,6 @@
                 </div>
             </div>
 
-            <!-- Delete Toast Message -->
-            <div class="position-fixed bottom-0 end-0 p-3">
-                <div id="deleteToast"
-                    class="toast text-bg-danger border-0 w-100" role="alert"
-                    aria-live="assertive"
-                    aria-atomic="true">
-                    <div class="d-flex">
-                        <div
-                            class="toast-body delete-message fw-bold text-center">
-                            <!-- Toast message -->
-                        </div>
-                        <button type="button"
-                            class="btn-close btn-close-white me-2 m-auto"
-                            data-bs-dismiss="toast"
-                            aria-label="Close"></button>
-                    </div>
-                </div>
-            </div>
         </main>
 
         <script

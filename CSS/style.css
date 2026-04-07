@@ -45,10 +45,6 @@
     color: var(--color-red);
 }
 
-.empData .mainContent .form-label.field-filled:after {
-    content: "";
-}
-
 .empData .mainContent .statusColToggle,
 .empData .mainContent .formToggle {
     width: 36px !important;
@@ -79,6 +75,24 @@ select:required:invalid {
 .empData .mainContent .selectAllRows {
     width: 16px;
     height: 16px;
+}
+
+.empData .mainContent .employeeProfile {
+    max-width: 40px !important;
+    max-height: 40px !important;
+}
+
+.empData .mainContent .img-thumbnail {
+    max-width: 50px !important;
+    max-height: 50px !important;
+}
+
+@media only screen and (max-width: 576px) {
+
+    .empData .mainContent .tableHead,
+    #empDataRow>td {
+        font-size: 14px;
+    }
 }
 
 /* Custom Soft Pastel Buttons */
@@ -145,4 +159,12 @@ select:required:invalid {
 .text-ellipsis {
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.top-11 {
+    top: -11% !important;
+}
+
+.top-37 {
+    top: -37% !important;
 }

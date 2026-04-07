@@ -23,9 +23,6 @@ const empFormFields = document.getElementById("empForm");
 const modalHeading = document.getElementById("employeeModalLabel");
 const deleteConfirmModal = document.getElementById("deleteConfirmationModal");
 
-const interactFields = document.querySelector(".interactFields");
-const statusColToggle = document.querySelectorAll(".statusColToggle");
-
 let employeeData = JSON.parse(localStorage.getItem("EmpData")) || [];
 employeeData = employeeData.map((emp) => ({
   ...emp,
@@ -38,22 +35,11 @@ let nameAsc = true;
 let salaryAsc = true;
 let dateAsc = true;
 
-// Display toast notification for successful add/edit operations
-const showAcknowledgeToast = (message) => {
+// Display toast notification.
+const showAcknowledgeToast = (message, bg) => {
   const toastContainer = document.getElementById("notificationToast");
   const toastBody = toastContainer.querySelector(".toast-message");
-
-  toastBody.textContent = message;
-
-  const toast = new bootstrap.Toast(toastContainer);
-  toast.show();
-};
-
-// Display toast notification for delete operations
-const showWarningToast = (message) => {
-  const toastContainer = document.getElementById("deleteToast");
-  const toastBody = toastContainer.querySelector(".delete-message");
-
+  toastContainer.classList.add(bg)
   toastBody.textContent = message;
 
   const toast = new bootstrap.Toast(toastContainer);
@@ -74,21 +60,21 @@ const renderEmpTable = (data) => {
     .map(
       (emp) => `
                           <tr id="empDataRow">
-                            <td class="align-content-center px-3">
-                              <input type=checkbox name="selectRow" class="selectRow cursor-pointer" onclick="return toggleRowSelection('${emp.email}')" ${emp.selected ? "checked" : ""} data-email="${emp.email}">
+                            <td class="align-content-center px-sm-3 px-2">
+                              <input type="checkbox" name="selectRow" class="selectRow cursor-pointer" onclick="return toggleRowSelection('${emp.email}')" ${emp.selected ? "checked" : ""} data-email="${emp.email}">
                             </td>
-                            <td class="text-start px-3 text-secondary-emphasis">
+                            <td class="text-start px-sm-3 ps-1 pe-2 text-secondary-emphasis">
                               <div class="d-flex align-items-center">
-                                <img src="${emp.src.startsWith("data:") ? emp.src : "../Images/" + emp.src}" id="imgPreview" width='40' height='40' alt='profile' class='align-content-center border border-0 rounded-circle me-3 my-2 object-fit-fill'><span class="text-ellipsis w-50 overflow-hidden cursor-default" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${emp.fullName}">${emp.fullName}</span>
+                                <img src="${emp.src.startsWith("data:") ? emp.src : "../Images/" + emp.src}" id="imgPreview" width='40' height='40' alt='profile' class='employeeProfile align-content-center border border-0 rounded-circle me-2 my-2 object-fit-contain'><span class="text-ellipsis w-75 overflow-hidden cursor-default" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${emp.fullName}">${emp.fullName}</span>
                               </div>
                             </td>
-                            <td class="align-content-center px-3 text-secondary-emphasis">
+                            <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis">
                                 <span class="d-inline-block text-ellipsis w-75 overflow-hidden cursor-default" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${emp.email}">${emp.email}</span>
                             </td>
-                            <td class="align-content-center px-3 text-secondary-emphasis">${emp.department}</td>
-                            <td class="align-content-center px-3 text-secondary-emphasis">${emp.role}</td>
-                            <td class="align-content-center px-3 text-secondary-emphasis">$ ${emp.salary}</td>
-                            <td class="align-content-center px-3 text-secondary-emphasis">${emp.joiningDate}</td>
+                            <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis">${emp.department}</td>
+                            <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis">${emp.role}</td>
+                            <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis">$ ${emp.salary}</td>
+                            <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis">${emp.joiningDate}</td>
                             <td class="align-content-center">
                               <div class="form-check form-switch d-flex justify-content-center">
                                 <input onchange="return changeToggleStatus('${emp.email}')"
@@ -98,7 +84,7 @@ const renderEmpTable = (data) => {
                             </td>
                             <td class="align-content-center">
                             <div class="d-flex justify-content-center gap-3">
-                              <span class="cursor-pointer py-2" onclick="return editEmployee('${emp.email}')"><img src="../Icons/edit-btn.svg" alt="edit-button" width="18" height="18" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit"></span>
+                              <span class="cursor-pointer py-2" onclick="return onEditEmployee('${emp.email}')"><img src="../Icons/edit-btn.svg" alt="edit-button" width="18" height="18" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit"></span>
                               <span class="cursor-pointer py-2" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" onclick="return confirmDelete('${emp.email}')"><img src="../Icons/delete-btn.svg" alt="delete-button" width="18" height="18" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete"></span>
                             </div>
                             </td>
@@ -135,7 +121,7 @@ const toggleRowSelection = (email) => {
   }
 
   showAcknowledgeToast(
-    `${totalSelected} of ${currentDisplayData.length} Row(s) selected.`,
+    `${totalSelected} of ${currentDisplayData.length} Row(s) selected.`, "text-bg-success"
   );
 };
 
@@ -145,7 +131,7 @@ const selectAllRows = (checkBox) => {
   currentDisplayData.forEach((emp) => (emp.selected = isChecked));
 
   if (isChecked && employeeData.length > 0) {
-    showAcknowledgeToast(`${currentDisplayData.length} Row(s) selected.`);
+    showAcknowledgeToast(`${currentDisplayData.length} Row(s) selected.`, "text-bg-success");
     document.getElementById("deleteRecords").classList.remove("d-none");
   } else {
     document.getElementById("deleteRecords").classList.add("d-none");
@@ -160,7 +146,7 @@ const deleteRecords = () => {
   employeeData = employeeData.filter((emp) => !emp.selected);
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
   currentDisplayData = [...employeeData];
-  showWarningToast(`Selected records are deleted.`);
+  showAcknowledgeToast(`Selected records are deleted.`, "text-bg-success");
   filterEmpData();
   renderEmpTable(currentDisplayData);
 };
@@ -169,82 +155,80 @@ const deleteRecords = () => {
 const updateFilterPills = () => {
   let pillsContainer = document.getElementById("filterPills");
   pillsContainer.innerHTML = "";
-  let selectedDept = document.getElementById("departmentDropDown").value;
-  let selectedStatus = document.getElementById("statusDropDown").value;
-  let minSalary = document.getElementById("minSal").value;
-  let maxSalary = document.getElementById("maxSal").value;
+  let selectedDept = document.getElementById("departmentDropDown");
+  let selectedStatus = document.getElementById("statusDropDown");
+  let minSalary = document.getElementById("minSal");
+  let maxSalary = document.getElementById("maxSal");
 
   // Helper function to create individual pill
-  const createPill = (text, removeFn) => {
+  const createPill = (text, field) => {
     const pill = document.createElement("span");
     pill.innerHTML = "";
     pill.className =
       "btn btn-sm rounded-4 ps-3 pe-2 btn-outline-secondary d-flex align-items-center cursor-pointer gap-1";
     pill.innerHTML = `${text} <button type="button" class="btn btn-close btn-sm ms-2" aria-label="Close"></button>`;
     pillsContainer.appendChild(pill);
-    pill.querySelector("button").onclick = removeFn;
+    const closeBtn = pill.querySelector("button");
+
+    closeBtn.addEventListener("click", () => {
+      field.value = "";
+      filterEmpData();
+      updateFilterPills();
+    });
   };
 
-  const createClearPill = (text, removeFn) => {
+  const createClearPill = (text) => {
     const pill = document.createElement("span");
     pill.innerHTML = "";
     pill.className =
       "btn btn-sm btn-outline-danger rounded-4 d-flex align-items-center px-3 cursor-pointer";
     pill.innerHTML = `${text}`;
     pillsContainer.appendChild(pill);
-    pill.onclick = removeFn;
+    pill.addEventListener("click", () => {
+      selectedDept.value = "";
+      selectedStatus.value = "";
+      minSalary.value = "";
+      maxSalary.value = "";
+      filterEmpData();
+      updateFilterPills();
+    });
   };
 
   // Create department pill
-  if (selectedDept) {
-    createPill(selectedDept, () => {
-      document.getElementById("departmentDropDown").value = "";
-      filterEmpData();
-      updateFilterPills();
-    });
+  if (selectedDept.value) {
+    createPill(selectedDept.value, selectedDept);
   }
 
   // Create status pill
-  if (selectedStatus) {
-    createPill(selectedStatus, () => {
-      document.getElementById("statusDropDown").value = "";
-      filterEmpData();
-      updateFilterPills();
-    });
+  if (selectedStatus.value) {
+    createPill(selectedStatus.value, selectedStatus);
   }
 
   // Create minimum salary pill
-  if (minSalary) {
-    createPill(`Min Salary: ${minSalary}`, () => {
-      document.getElementById("minSal").value = "";
-      filterEmpData();
-      updateFilterPills();
-    });
+  if (minSalary.value) {
+    createPill(`Min Salary: ${minSalary.value}`, minSalary);
   }
 
   // Create maximum salary pill
-  if (maxSalary) {
-    createPill(`Max Salary: ${maxSalary}`, () => {
-      document.getElementById("maxSal").value = "";
-      filterEmpData();
-      updateFilterPills();
-    });
+  if (maxSalary.value) {
+    createPill(`Max Salary: ${maxSalary.value}`, maxSalary);
   }
 
   // Check if any filter is active
   const hasActiveFilters =
-    selectedDept || selectedStatus || minSalary || maxSalary;
+    selectedDept.value ||
+    selectedStatus.value ||
+    minSalary.value ||
+    maxSalary.value;
 
   // Create "Clear All" pill if any filter is active
   if (hasActiveFilters) {
-    createClearPill("Clear All", () => {
-      document.getElementById("departmentDropDown").value = "";
-      document.getElementById("statusDropDown").value = "";
-      document.getElementById("minSal").value = "";
-      document.getElementById("maxSal").value = "";
-      filterEmpData();
-      updateFilterPills();
-    });
+    createClearPill("Clear All");
+    document.getElementById("deleteSelectedRow").classList.remove("top-11");
+    document.getElementById("deleteSelectedRow").classList.add("top-37");
+  } else {
+    document.getElementById("deleteSelectedRow").classList.add("top-11");
+    document.getElementById("deleteSelectedRow").classList.remove("top-37");
   }
 };
 
@@ -305,7 +289,7 @@ const deleteProfile = () => {
 };
 
 // Add new employee or update existing employee
-const addEmployee = (e) => {
+const addOrUpdateEmployee = (e) => {
   e.preventDefault();
 
   const formObj = {
@@ -322,13 +306,13 @@ const addEmployee = (e) => {
   if (editingIndex === -1) {
     // Adding new employee
     employeeData.push(formObj);
-    showAcknowledgeToast(`Employee '${formObj.fullName}' Added Successfully.`);
+    showAcknowledgeToast(`Employee '${formObj.fullName}' Added Successfully.`, "text-bg-success");
   } else {
     // Updating existing employee
     employeeData[editingIndex] = formObj;
     editingIndex = -1;
     showAcknowledgeToast(
-      `Employee '${formObj.fullName}' Updated Successfully.`,
+      `Employee '${formObj.fullName}' Updated Successfully.`, "text-bg-success"
     );
   }
 
@@ -343,7 +327,7 @@ const addEmployee = (e) => {
 };
 
 // Populate form for editing an employee
-const editEmployee = (email) => {
+const onEditEmployee = (email) => {
   modalHeading.textContent = "Update Employee";
   const employee = employeeData.find((emp) => emp.email === email);
 
@@ -400,7 +384,7 @@ const deleteEmployee = (email) => {
   employeeData.splice(position, 1);
 
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
-  showWarningToast(`Employee ${employee.fullName} Deleted!`);
+  showAcknowledgeToast(`Employee ${employee.fullName} Deleted!`, "text-bg-success");
   filterEmpData();
 
   if (employeeData.length === 0) {
@@ -425,7 +409,7 @@ const changeToggleStatus = (email) => {
     employeeMail.status === "Active" ? "Inactive" : "Active";
 
   showAcknowledgeToast(
-    `Status of '${employeeMail.fullName}' changed to ${employeeMail.status}.`,
+    `Status of '${employeeMail.fullName}' changed to ${employeeMail.status}.`, "text-bg-success"
   );
 
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
@@ -437,10 +421,12 @@ const changeToggleStatus = (email) => {
 const filterEmpData = () => {
   const selectedDept = document.getElementById("departmentDropDown").value;
   const selectedStatus = document.getElementById("statusDropDown").value;
-  const minSalary = document.getElementById("minSal").value;
-  const maxSalary = document.getElementById("maxSal").value;
-  const min = minSalary ? Number(minSalary) : 0;
-  const max = maxSalary ? Number(maxSalary) : Infinity;
+  const min = document.getElementById("minSal").value
+    ? Number(document.getElementById("minSal").value)
+    : 0;
+  const max = document.getElementById("maxSal").value
+    ? Number(document.getElementById("maxSal").value)
+    : Infinity;
   const maxSalInput = document.getElementById("maxSal");
 
   const searchBox = document.getElementById("searchBox");
@@ -489,31 +475,36 @@ const filterEmpData = () => {
 const sortEmpName = () => {
   const dataToSort = [...currentDisplayData];
   dataToSort.sort((a, b) => {
-    
     if (nameAsc) {
-      document.getElementById("sortByName").src = "../Icons/sort-down.svg"
+      document.getElementById("sortByName").src = "../Icons/sort-down.svg";
+      document.getElementById("sortBySalary").src = "../Icons/sort-arrow.svg";
+      document.getElementById("sortByDate").src = "../Icons/sort-arrow.svg";
       return a.fullName.localeCompare(b.fullName);
     } else {
-      document.getElementById("sortByName").src = "../Icons/sort-up.svg"
+      document.getElementById("sortByName").src = "../Icons/sort-up.svg";
+      document.getElementById("sortBySalary").src = "../Icons/sort-arrow.svg";
+      document.getElementById("sortByDate").src = "../Icons/sort-arrow.svg";
       return b.fullName.localeCompare(a.fullName);
-    } 
+    }
   });
   nameAsc = !nameAsc;
 
-  renderEmpTable(dataToSort)
+  renderEmpTable(dataToSort);
 };
-
 
 // Sort employees by salary (ascending/descending)
 const sortEmpSalary = () => {
   const dataToSort = [...currentDisplayData];
   dataToSort.sort((a, b) => {
-
     if (salaryAsc) {
       document.getElementById("sortBySalary").src = "../Icons/sort-down.svg";
+      document.getElementById("sortByName").src = "../Icons/sort-arrow.svg";
+      document.getElementById("sortByDate").src = "../Icons/sort-arrow.svg";
       return Number(a.salary) - Number(b.salary);
     } else {
       document.getElementById("sortBySalary").src = "../Icons/sort-up.svg";
+      document.getElementById("sortByName").src = "../Icons/sort-arrow.svg";
+      document.getElementById("sortByDate").src = "../Icons/sort-arrow.svg";
       return Number(b.salary) - Number(a.salary);
     }
   });
@@ -526,12 +517,15 @@ const sortEmpSalary = () => {
 const sortEmpDate = () => {
   const dataToSort = [...currentDisplayData];
   dataToSort.sort((a, b) => {
-
     if (dateAsc) {
       document.getElementById("sortByDate").src = "../Icons/sort-down.svg";
+      document.getElementById("sortBySalary").src = "../Icons/sort-arrow.svg";
+      document.getElementById("sortByName").src = "../Icons/sort-arrow.svg";
       return new Date(a.joiningDate) - new Date(b.joiningDate);
     } else {
       document.getElementById("sortByDate").src = "../Icons/sort-up.svg";
+      document.getElementById("sortBySalary").src = "../Icons/sort-arrow.svg";
+      document.getElementById("sortByName").src = "../Icons/sort-arrow.svg";
       return new Date(b.joiningDate) - new Date(a.joiningDate);
     }
   });
@@ -548,9 +542,9 @@ const exportToCsv = () => {
     let blob = new Blob([csvData], { type: "text/csv" });
     exportBtn.download = "Employee-Data.csv";
     exportBtn.href = URL.createObjectURL(blob);
-    showAcknowledgeToast("Employee Data Downloaded Successfully.");
+    showAcknowledgeToast("Employee Data Downloaded Successfully.", "text-bg-success");
   } else {
-    showWarningToast("No Employee Data Available!");
+    showAcknowledgeToast("No Employee Data Available!", "text-bg-danger");
   }
 };
 
@@ -579,8 +573,8 @@ const validateName = () => {
   }
 };
 
-// Validate salary (no "dash", "e", "+" allowed)
-const validateSalary = (e) => {
+// Validate Number Input (no "dash", "e", "+" allowed)
+const validateNumberInput = (e) => {
   if (e.key === "-" || e.key === "e" || e.key === "+") e.preventDefault();
 };
 
@@ -648,35 +642,27 @@ employeeForm.addEventListener("hidden.bs.modal", () => {
   profilePreview.classList.add("d-none");
 });
 
-// Handle department filter change
-document.getElementById("departmentDropDown").addEventListener("change", () => {
-  filterEmpData();
-  updateFilterPills();
-});
+const handleFieldChange = (field, event) => {
+  document.getElementById(field).addEventListener(event, () => {
+    filterEmpData();
+    updateFilterPills();
+  });
+};
 
-// Handle status filter change
-document.getElementById("statusDropDown").addEventListener("change", () => {
-  filterEmpData();
-  updateFilterPills();
-});
-
-// Handle minimum salary filter change
-document.getElementById("minSal").addEventListener("input", () => {
-  filterEmpData();
-  updateFilterPills();
-});
-
-// Handle maximum salary filter change
-document.getElementById("maxSal").addEventListener("input", () => {
-  filterEmpData();
-  updateFilterPills();
-});
+handleFieldChange("departmentDropDown", "change");
+handleFieldChange("statusDropDown", "change");
+handleFieldChange("minSal", "input");
+handleFieldChange("maxSal", "input");
 
 // Load and display initial data
 currentDisplayData = [...employeeData];
 renderEmpTable(employeeData);
 
+// Validation to prevent future Dates.
+const today = new Date().toISOString().split("T")[0];
+empJoinDate.setAttribute("max", today);
+
 // Welcome Toast
 window.onload = () => {
-  showAcknowledgeToast("Welcome to Employee Management System!");
+  showAcknowledgeToast("Welcome to Employee Management System!", "text-bg-success");
 };
