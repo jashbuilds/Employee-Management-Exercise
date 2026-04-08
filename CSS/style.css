@@ -78,12 +78,16 @@ select:required:invalid {
 }
 
 .empData .mainContent .employeeProfile {
+    min-width: 40px !important;
     max-width: 40px !important;
+    min-height: 40px !important;
     max-height: 40px !important;
 }
 
 .empData .mainContent .img-thumbnail {
+    min-width: 50px !important;
     max-width: 50px !important;
+    min-height: 50px !important;
     max-height: 50px !important;
 }
 
@@ -167,4 +171,8 @@ select:required:invalid {
 
 .top-37 {
     top: -37% !important;
+}
+
+.w-70 {
+    width: 70% !important;
 }

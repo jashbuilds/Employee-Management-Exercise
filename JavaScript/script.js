@@ -39,7 +39,7 @@ let dateAsc = true;
 const showAcknowledgeToast = (message, bg) => {
   const toastContainer = document.getElementById("notificationToast");
   const toastBody = toastContainer.querySelector(".toast-message");
-  toastContainer.classList.add(bg)
+  toastContainer.classList.add(bg);
   toastBody.textContent = message;
 
   const toast = new bootstrap.Toast(toastContainer);
@@ -65,11 +65,12 @@ const renderEmpTable = (data) => {
                             </td>
                             <td class="text-start px-sm-3 ps-1 pe-2 text-secondary-emphasis">
                               <div class="d-flex align-items-center">
-                                <img src="${emp.src.startsWith("data:") ? emp.src : "../Images/" + emp.src}" id="imgPreview" width='40' height='40' alt='profile' class='employeeProfile align-content-center border border-0 rounded-circle me-2 my-2 object-fit-contain'><span class="text-ellipsis w-75 overflow-hidden cursor-default" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${emp.fullName}">${emp.fullName}</span>
+                                <img src="${emp.src.startsWith("data:") ? emp.src : "../Images/" + emp.src}" id="imgPreview" width='40' height='40' alt='profile' class='employeeProfile align-content-center border border-0 rounded-circle me-2 my-2 object-fit-cover'>
+                                <span class="text-ellipsis w-70 overflow-hidden cursor-default" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${emp.fullName}">${emp.fullName}</span>
                               </div>
                             </td>
                             <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis">
-                                <span class="d-inline-block text-ellipsis w-75 overflow-hidden cursor-default" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${emp.email}">${emp.email}</span>
+                                <span class="d-inline-block text-ellipsis w-70 overflow-hidden cursor-default" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${emp.email}">${emp.email}</span>
                             </td>
                             <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis">${emp.department}</td>
                             <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis">${emp.role}</td>
@@ -78,7 +79,7 @@ const renderEmpTable = (data) => {
                             <td class="align-content-center">
                               <div class="form-check form-switch d-flex justify-content-center">
                                 <input onchange="return changeToggleStatus('${emp.email}')"
-                                  class="form-check-input border border-1 ${emp.status === "Active" ? "bg-light-green" : ""} cursor-pointer statusColToggle" type="checkbox" role="switch" switch ${emp.status === "Active" ? "checked" : ""}>
+                                  class="${emp.status === "Active" ? "bg-light-green" : ""} form-check-input border border-1 cursor-pointer statusColToggle" type="checkbox" role="switch" switch ${emp.status === "Active" ? "checked" : ""}>
                                   <p class="d-none">${emp.status}</p> <!-- Hidden text to show status in csv file -->
                               </div>
                             </td>
@@ -121,7 +122,8 @@ const toggleRowSelection = (email) => {
   }
 
   showAcknowledgeToast(
-    `${totalSelected} of ${currentDisplayData.length} Row(s) selected.`, "text-bg-success"
+    `${totalSelected} of ${currentDisplayData.length} Row(s) selected.`,
+    "text-bg-success",
   );
 };
 
@@ -131,7 +133,10 @@ const selectAllRows = (checkBox) => {
   currentDisplayData.forEach((emp) => (emp.selected = isChecked));
 
   if (isChecked && employeeData.length > 0) {
-    showAcknowledgeToast(`${currentDisplayData.length} Row(s) selected.`, "text-bg-success");
+    showAcknowledgeToast(
+      `${currentDisplayData.length} Row(s) selected.`,
+      "text-bg-success",
+    );
     document.getElementById("deleteRecords").classList.remove("d-none");
   } else {
     document.getElementById("deleteRecords").classList.add("d-none");
@@ -146,6 +151,7 @@ const deleteRecords = () => {
   employeeData = employeeData.filter((emp) => !emp.selected);
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
   currentDisplayData = [...employeeData];
+  document.querySelector(".selectAllRows").checked = false
   showAcknowledgeToast(`Selected records are deleted.`, "text-bg-success");
   filterEmpData();
   renderEmpTable(currentDisplayData);
@@ -189,6 +195,7 @@ const updateFilterPills = () => {
       selectedStatus.value = "";
       minSalary.value = "";
       maxSalary.value = "";
+    
       filterEmpData();
       updateFilterPills();
     });
@@ -224,12 +231,9 @@ const updateFilterPills = () => {
   // Create "Clear All" pill if any filter is active
   if (hasActiveFilters) {
     createClearPill("Clear All");
-    document.getElementById("deleteSelectedRow").classList.remove("top-11");
-    document.getElementById("deleteSelectedRow").classList.add("top-37");
-  } else {
-    document.getElementById("deleteSelectedRow").classList.add("top-11");
-    document.getElementById("deleteSelectedRow").classList.remove("top-37");
-  }
+    // document.getElementById("deleteSelectedRow").classList.remove("top-11");
+    // document.getElementById("deleteSelectedRow").classList.add("top-37");
+  } 
 };
 
 // Update required field indicators (asterisks on labels)
@@ -303,23 +307,40 @@ const addOrUpdateEmployee = (e) => {
     src: currentProfileDataUrl || "default-profile.png",
   };
 
-  if (editingIndex === -1) {
+  if (
+    editingIndex === -1 &&
+    empName.value &&
+    empMail.value &&
+    empDept.value &&
+    empRole.value &&
+    empSalary.value &&
+    empJoinDate.value
+  ) {
     // Adding new employee
     employeeData.push(formObj);
-    showAcknowledgeToast(`Employee '${formObj.fullName}' Added Successfully.`, "text-bg-success");
-  } else {
+    showAcknowledgeToast(
+      `Employee '${formObj.fullName}' Added Successfully.`,
+      "text-bg-success",
+    );
+  } else if (
+    empName.value &&
+    empMail.value &&
+    empDept.value &&
+    empRole.value &&
+    empSalary.value &&
+    empJoinDate.value
+  ) {
     // Updating existing employee
     employeeData[editingIndex] = formObj;
     editingIndex = -1;
     showAcknowledgeToast(
-      `Employee '${formObj.fullName}' Updated Successfully.`, "text-bg-success"
+      `Employee '${formObj.fullName}' Updated Successfully.`,
+      "text-bg-success",
     );
   }
 
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
 
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Submit";
   filterEmpData();
   executeUpload();
   empFormFields.reset();
@@ -384,7 +405,10 @@ const deleteEmployee = (email) => {
   employeeData.splice(position, 1);
 
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
-  showAcknowledgeToast(`Employee ${employee.fullName} Deleted!`, "text-bg-success");
+  showAcknowledgeToast(
+    `Employee '${employee.fullName}' Deleted!`,
+    "text-bg-success",
+  );
   filterEmpData();
 
   if (employeeData.length === 0) {
@@ -396,25 +420,30 @@ const deleteEmployee = (email) => {
 // Setup delete confirmation modal with callback
 const confirmDelete = (email) => {
   document.getElementById("deleteConfirm").innerHTML =
-    `<button type="button" class="btn btn-outline-secondary"
-                                data-bs-dismiss="modal">No</button>
-                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="return deleteEmployee('${email}')">Yes</button>`;
+    `<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">No</button>
+     <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="return deleteEmployee('${email}')">Yes</button>`;
 };
 
 // Toggle employee status (Active/Inactive)
 const changeToggleStatus = (email) => {
   const employeeMail = employeeData.find((emp) => emp.email === email);
 
-  employeeMail.status =
-    employeeMail.status === "Active" ? "Inactive" : "Active";
+  employeeMail.status = employeeMail.status === "Active" ? "Inactive" : "Active";
+
+  const statusCol = document.querySelectorAll(".statusColToggle");
+
+  statusCol.forEach((sc) => {
+    sc.checked
+      ? sc.classList.add("bg-light-green")
+      : sc.classList.remove("bg-light-green");
+  });
 
   showAcknowledgeToast(
-    `Status of '${employeeMail.fullName}' changed to ${employeeMail.status}.`, "text-bg-success"
+    `Status of '${employeeMail.fullName}' changed to ${employeeMail.status}.`,
+    "text-bg-success",
   );
 
   localStorage.setItem("EmpData", JSON.stringify(employeeData));
-
-  filterEmpData();
 };
 
 // Filter employees by department, status, and salary range
@@ -542,7 +571,10 @@ const exportToCsv = () => {
     let blob = new Blob([csvData], { type: "text/csv" });
     exportBtn.download = "Employee-Data.csv";
     exportBtn.href = URL.createObjectURL(blob);
-    showAcknowledgeToast("Employee Data Downloaded Successfully.", "text-bg-success");
+    showAcknowledgeToast(
+      "Employee Data Downloaded Successfully.",
+      "text-bg-success",
+    );
   } else {
     showAcknowledgeToast("No Employee Data Available!", "text-bg-danger");
   }
@@ -629,13 +661,10 @@ employeeForm.addEventListener("hidden.bs.modal", () => {
   document.querySelectorAll(".form-label.field-filled").forEach((label) => {
     label.classList.remove("field-filled");
   });
-  if (statusToggle.checked) {
-    statusToggle.classList.add("bg-light-green");
-    statusMsg.value = "Active";
-  } else {
-    statusToggle.classList.remove("bg-light-green");
-    statusMsg.value = "Inactive";
-  }
+
+  statusToggle.classList.add("bg-light-green");
+  statusMsg.value = "Active";
+  statusMsg.textContent = "Active";
 
   document.getElementById("deleteProfilePic").classList.add("d-none");
   document.getElementById("fileUpload").classList.remove("d-none");
@@ -664,5 +693,8 @@ empJoinDate.setAttribute("max", today);
 
 // Welcome Toast
 window.onload = () => {
-  showAcknowledgeToast("Welcome to Employee Management System!", "text-bg-success");
+  showAcknowledgeToast(
+    "Welcome to Employee Management System!",
+    "text-bg-success",
+  );
 };
