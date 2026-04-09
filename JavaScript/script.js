@@ -63,7 +63,7 @@ const renderEmpTable = (data) => {
                             <td class="align-content-center px-sm-3 px-2">
                               <input type="checkbox" name="selectRow" class="selectRow cursor-pointer" onclick="return toggleRowSelection('${emp.email}')" ${emp.selected ? "checked" : ""} data-email="${emp.email}">
                             </td>
-                            <td class="text-start px-sm-3 ps-1 pe-2 text-secondary-emphasis">
+                            <td class="align-content-center text-start px-sm-3 ps-1 pe-2 text-secondary-emphasis">
                               <div class="d-flex align-items-center">
                                 <img src="${emp.src.startsWith("data:") ? emp.src : "../Images/" + emp.src}" id="imgPreview" width='40' height='40' alt='profile' class='employeeProfile align-content-center border border-0 rounded-circle me-2 my-2 object-fit-cover'>
                                 <span class="text-ellipsis w-70 overflow-hidden cursor-default" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${emp.fullName}">${emp.fullName}</span>
@@ -73,7 +73,11 @@ const renderEmpTable = (data) => {
                                 <span class="d-inline-block text-ellipsis w-70 overflow-hidden cursor-default" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${emp.email}">${emp.email}</span>
                             </td>
                             <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis">${emp.department}</td>
-                            <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis">${emp.role}</td>
+                            <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis responsive-text mw-50">
+                              <p class="w-75 m-0">
+                                ${emp.role}
+                              </p>
+                            </td>
                             <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis">$ ${emp.salary}</td>
                             <td class="align-content-center px-sm-3 ps-1 pe-2 text-secondary-emphasis">${emp.joiningDate}</td>
                             <td class="align-content-center">
@@ -231,8 +235,6 @@ const updateFilterPills = () => {
   // Create "Clear All" pill if any filter is active
   if (hasActiveFilters) {
     createClearPill("Clear All");
-    // document.getElementById("deleteSelectedRow").classList.remove("top-11");
-    // document.getElementById("deleteSelectedRow").classList.add("top-37");
   } 
 };
 

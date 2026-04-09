@@ -176,3 +176,12 @@ select:required:invalid {
 .w-70 {
     width: 70% !important;
 }
+
+.mw-50{
+    max-width: 250px;
+}
+
+.responsive-text {
+    white-space: wrap;
+    word-wrap: break-word;
+}
